@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Stock {
+  id           Int       @id @default(autoincrement())
+  ticker       String    @unique
+  companyName  String?
+  summary      String?
+  risk         String?
+  catalyst     String?
+  themeBenefit String?
+  themePhase   Int?
+  rawJson      String?
+  isArchived   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  reports      Report[]
+  memberships  WatchlistStock[]
+  stockThemes  StockTheme[]
+  stockCategories StockCategory[]
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  stockId      Int
+  filePath     String
+  generatedAt  DateTime @default(now())
+  version      Int
+  stock        Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+
+  @@unique([stockId, version])
+}
+
+model Watchlist {
+  id         Int             @id @default(autoincrement())
+  name       String
+  createdAt  DateTime        @default(now())
+  stocks     WatchlistStock[]
+
+  @@unique([name])
+}
+
+model WatchlistStock {
+  watchlistId Int
+  stockId     Int
+  addedAt     DateTime @default(now())
+  watchlist   Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+  stock       Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+
+  @@id([watchlistId, stockId])
+}
+
+model Theme {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  color String @default("#9CA3AF")
+  stocks StockTheme[]
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  stocks StockCategory[]
+}
+
+model TableFieldConfig {
+  id       Int     @id @default(autoincrement())
+  key      String  @unique
+  label    String
+  isVisible Boolean @default(true)
+  position Int     @default(0)
+}
+
+model StockTheme {
+  stockId Int
+  themeId Int
+  stock   Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  theme   Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@id([stockId, themeId])
+}
+
+model StockCategory {
+  stockId    Int
+  categoryId Int
+  stock      Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([stockId, categoryId])
+}
