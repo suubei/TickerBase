@@ -242,14 +242,7 @@ export function StockModule(props: StockModuleProps) {
                     }
 
                     if (column.key === "ticker") {
-                      return (
-                        <td key={column.key} className="ticker-cell">
-                          <div className="ticker-cell-wrap">
-                            <div className="ticker-cell-label">{formatCellValue(column.key, value)}</div>
-                            {stock.isArchived && <span className="ticker-archived-badge">Archived</span>}
-                          </div>
-                        </td>
-                      );
+                      return <td key={column.key} className="ticker-cell">{formatCellValue(column.key, value)}</td>;
                     }
 
                     return <td key={column.key}>{formatCellValue(column.key, value)}</td>;
