@@ -580,8 +580,7 @@ button {
   color: var(--text-soft);
 }
 
-.module2-panel input:not([type="checkbox"]):not(.module2-search-input),
-.module2-panel select {
+.module2-panel input:not([type="checkbox"]):not(.module2-search-input) {
   height: 34px;
   border: 1px solid var(--line-strong);
   border-radius: 6px;
@@ -591,10 +590,62 @@ button {
   background: var(--panel);
 }
 
-.module2-panel input:not([type="checkbox"]):focus,
-.module2-panel select:focus {
+.module2-panel input:not([type="checkbox"]):not(.module2-search-input):focus {
   border-color: var(--line-accent);
   box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+/* Custom select wrapper */
+.filter-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--text-muted);
+}
+
+.filter-select-wrap select {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  padding: 0 30px 0 11px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-subtle);
+  background: var(--panel);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-width: 130px;
+}
+
+.filter-select-wrap select:hover {
+  border-color: var(--line-accent);
+  background: var(--panel-soft);
+}
+
+.filter-select-wrap select:focus {
+  outline: none;
+  border-color: var(--line-accent);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+.filter-select-wrap select option {
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .module2-topbar .actions {

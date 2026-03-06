@@ -150,18 +150,24 @@ export function StockModule(props: StockModuleProps) {
         <div className="module2-search-wrap">
           <input className="module2-search-input" value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search stocks…" />
         </div>
-        <select value={categoryFilter} onChange={(e) => onCategoryFilterChange(e.target.value)}>
-          <option value="">All categories</option>
-          {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <select value={themeFilter} onChange={(e) => onThemeFilterChange(e.target.value)}>
-          <option value="">All themes</option>
-          {themes.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
-        <select value={watchlistFilter} onChange={(e) => onWatchlistFilterChange(e.target.value)}>
-          <option value="">All watchlists</option>
-          {watchlistNames.map((name) => <option key={name} value={name}>{name}</option>)}
-        </select>
+        <div className="filter-select-wrap">
+          <select value={categoryFilter} onChange={(e) => onCategoryFilterChange(e.target.value)}>
+            <option value="">All categories</option>
+            {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="filter-select-wrap">
+          <select value={themeFilter} onChange={(e) => onThemeFilterChange(e.target.value)}>
+            <option value="">All themes</option>
+            {themes.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <div className="filter-select-wrap">
+          <select value={watchlistFilter} onChange={(e) => onWatchlistFilterChange(e.target.value)}>
+            <option value="">All watchlists</option>
+            {watchlistNames.map((name) => <option key={name} value={name}>{name}</option>)}
+          </select>
+        </div>
         <div className="module2-segmented">
           <button className={archivedFilter === "all" ? "active" : ""} onClick={() => onArchivedFilterChange("all")}>All</button>
           <button className={archivedFilter === "active" ? "active" : ""} onClick={() => onArchivedFilterChange("active")}>Active</button>
