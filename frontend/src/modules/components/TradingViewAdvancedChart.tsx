@@ -37,7 +37,10 @@ export function TradingViewAdvancedChart({ symbol }: TradingViewAdvancedChartPro
       watchlist: [],
       withdateranges: false,
       compareSymbols: [],
-      studies: [],
+      studies: [
+        "STD;MA%Ribbon",
+        "STD;SMA"
+      ],
       support_host: "https://www.tradingview.com"
     });
     host.appendChild(script);
