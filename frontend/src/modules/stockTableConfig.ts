@@ -18,15 +18,15 @@ export type ColumnConfig = {
 };
 
 export const defaultCoreColumns: ColumnConfig[] = [
-  { key: "ticker", label: "股票代码", source: "core" },
-  { key: "category", label: "板块", source: "core" },
-  { key: "theme", label: "主题", source: "core" },
-  { key: "themePhase", label: "主题阶段", source: "core" },
-  { key: "summary", label: "定位", source: "core" },
-  { key: "themeBenefit", label: "主题受益", source: "core" },
-  { key: "catalyst", label: "核心催化剂", source: "core" },
-  { key: "risk", label: "最大风险", source: "core" },
-  { key: "updatedAt", label: "更新日期", source: "core" }
+  { key: "ticker", label: "Ticker", source: "core" },
+  { key: "category", label: "Category", source: "core" },
+  { key: "theme", label: "Theme", source: "core" },
+  { key: "themePhase", label: "Phase", source: "core" },
+  { key: "summary", label: "Summary", source: "core" },
+  { key: "themeBenefit", label: "Benefit", source: "core" },
+  { key: "catalyst", label: "Catalyst", source: "core" },
+  { key: "risk", label: "Risk", source: "core" },
+  { key: "updatedAt", label: "Updated", source: "core" }
 ];
 
 export function getCoreValue(stock: Stock, key: string): unknown {
