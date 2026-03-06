@@ -87,10 +87,6 @@ export function WatchlistModule({
 
         {/* ── Chart area ── */}
         <div className="watchlist-box watchlist-chart-box">
-          <div className="watchlist-chart-header">
-            <span className="watchlist-chart-ticker">{activeTicker}</span>
-            <span className="watchlist-chart-symbol">{activeChartTicker}</span>
-          </div>
           <div style={{ flex: 1, minHeight: 0 }}>
             {renderChart(activeChartTicker)}
           </div>
