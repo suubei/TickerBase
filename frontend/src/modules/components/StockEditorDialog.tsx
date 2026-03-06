@@ -39,9 +39,6 @@ export function StockEditorDialog({
         <div className="dialog-header">
           <div>
             <h2>{isEditing ? "Edit Stock" : "Create Stock"}</h2>
-            {isEditing && (
-              <p className="stock-editor-subtitle">Update existing record fields</p>
-            )}
           </div>
           <button className="btn-close stock-editor-close" aria-label="Close dialog" onClick={onClose}>✕</button>
         </div>
@@ -50,7 +47,6 @@ export function StockEditorDialog({
           <div className="stock-editor-body">
             <div className="stock-editor-pane-head">
               <span className="stock-editor-pane-label">JSON</span>
-              <span className="stock-editor-pane-desc">Update existing record fields</span>
             </div>
             <textarea
               className="stock-editor-textarea"
