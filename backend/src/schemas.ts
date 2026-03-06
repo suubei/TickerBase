@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const importSchema = z.object({
-  ticker: z.string().min(1),
+  ticker: z.string().min(1).optional(),
   originalTicker: z.string().min(1).optional(),
   jsonPayload: z.union([z.string(), z.record(z.any())]),
-  markdownReport: z.string().min(1),
+  markdownReport: z.string().optional(),
   action: z.enum(["update", "skip"]).optional()
 });
 

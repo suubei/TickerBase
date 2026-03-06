@@ -1,9 +1,11 @@
+import { useEffect, useMemo, useState } from "react";
+import { marked } from "marked";
+
 type ImportDialogProps = {
   isOpen: boolean;
-  ticker: string;
+  isEditing: boolean;
   jsonPayload: string;
   markdownReport: string;
-  onTickerChange: (value: string) => void;
   onJsonPayloadChange: (value: string) => void;
   onMarkdownReportChange: (value: string) => void;
   onClose: () => void;
@@ -12,46 +14,92 @@ type ImportDialogProps = {
 
 export function ImportDialog({
   isOpen,
-  ticker,
+  isEditing,
   jsonPayload,
   markdownReport,
-  onTickerChange,
   onJsonPayloadChange,
   onMarkdownReportChange,
   onClose,
   onSubmit
 }: ImportDialogProps) {
+  const [isPreview, setIsPreview] = useState(false);
+  const markdownHtml = useMemo(() => marked.parse(markdownReport) as string, [markdownReport]);
+
+  useEffect(() => {
+    if (!isOpen || isEditing) {
+      setIsPreview(false);
+    }
+  }, [isEditing, isOpen]);
+
   if (!isOpen) return null;
 
   return (
     <div className="dialog-backdrop" onClick={onClose}>
-      <section className="dialog-panel" onClick={(e) => e.stopPropagation()}>
+      <section className={`dialog-panel import-dialog ${isEditing ? "edit-mode" : "create-mode"}`} onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h2>数据录入</h2>
-          <button className="btn-ghost" onClick={onClose}>
-            关闭
-          </button>
+          <h2>{isEditing ? "Edit Record" : "Create Record"}</h2>
+          <button className="btn-close import-close" aria-label="Close dialog" onClick={onClose}>✕</button>
         </div>
-        <div className="grid-3">
-          <label>
-            Ticker
-            <input
-              value={ticker}
-              onChange={(e) => onTickerChange(e.target.value)}
-              placeholder="NVDA"
+
+        {isEditing ? (
+          <div className="import-edit-body">
+            <div className="import-pane-head">
+              <span className="import-pane-label">JSON</span>
+              <span className="import-pane-desc">Update existing record fields</span>
+            </div>
+            <textarea
+              className="import-textarea"
+              value={jsonPayload}
+              onChange={(e) => onJsonPayloadChange(e.target.value)}
+              rows={16}
+              spellCheck={false}
             />
-          </label>
-          <label>
-            AI JSON
-            <textarea value={jsonPayload} onChange={(e) => onJsonPayloadChange(e.target.value)} rows={10} />
-          </label>
-          <label>
-            AI Markdown Report
-            <textarea value={markdownReport} onChange={(e) => onMarkdownReportChange(e.target.value)} rows={10} />
-          </label>
-        </div>
-        <div className="actions">
-          <button className="btn-primary" onClick={onSubmit}>保存/更新</button>
+            <div className="import-hint">Required: <code>ticker</code></div>
+          </div>
+        ) : (
+          <div className="import-panes">
+            <div className="import-pane">
+              <div className="import-pane-head">
+                <span className="import-pane-label">JSON</span>
+                <span className="import-pane-desc">Defines record fields</span>
+              </div>
+              <textarea
+                className="import-textarea"
+                value={jsonPayload}
+                onChange={(e) => onJsonPayloadChange(e.target.value)}
+                rows={16}
+                spellCheck={false}
+              />
+              <div className="import-hint">Required: <code>ticker</code></div>
+            </div>
+            <div className="import-pane">
+              <div className="import-pane-head">
+                <span className="import-pane-label">Markdown</span>
+                <button
+                  className={`import-preview-toggle ${isPreview ? "active" : ""}`}
+                  onClick={() => setIsPreview((prev) => !prev)}
+                >
+                  {isPreview ? "Edit" : "Preview"}
+                </button>
+              </div>
+              {!isPreview ? (
+                <textarea
+                  className="import-textarea"
+                  value={markdownReport}
+                  onChange={(e) => onMarkdownReportChange(e.target.value)}
+                  rows={16}
+                  spellCheck={false}
+                />
+              ) : (
+                <article className="import-markdown-preview" dangerouslySetInnerHTML={{ __html: markdownHtml }} />
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="import-footer">
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" onClick={onSubmit}>{isEditing ? "Update" : "Create"}</button>
         </div>
       </section>
     </div>

@@ -8,11 +8,24 @@ type UseImportModuleOptions = {
 };
 
 export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModuleOptions) {
-  const [ticker, setTicker] = useState("");
   const [jsonPayload, setJsonPayload] = useState("{\n\n}");
   const [markdownReport, setMarkdownReport] = useState("# Report\n");
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
+
+  const isEditing = editingTicker !== null;
+
+  const extractTickerFromJson = useCallback((payload: string) => {
+    try {
+      const parsed = JSON.parse(payload) as Record<string, unknown>;
+      if (typeof parsed.ticker === "string" && parsed.ticker.trim()) {
+        return parsed.ticker.trim().toUpperCase();
+      }
+      return "";
+    } catch {
+      return "";
+    }
+  }, []);
 
   const closeImport = useCallback(() => {
     setIsImportOpen(false);
@@ -21,20 +34,28 @@ export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModul
 
   const submitImport = useCallback(async () => {
     onMessage("");
-    const submitTicker = ticker;
+    const submitTicker = extractTickerFromJson(jsonPayload);
+    if (!submitTicker) {
+      onMessage("jsonPayload 里必须包含 ticker 字段");
+      return;
+    }
     try {
       const result = await importStock({
         ticker: submitTicker,
         originalTicker: editingTicker ?? undefined,
         jsonPayload,
-        markdownReport
+        markdownReport: isEditing ? undefined : markdownReport
       });
       if ("skipped" in result) {
         onMessage(`Skipped ${result.ticker}`);
       } else {
-        onMessage(`${result.updated ? "Updated" : "Imported"} ${result.ticker}, v${result.version}`);
+        if (result.updated && isEditing) {
+          onMessage(`Updated ${result.ticker}`);
+        } else {
+          onMessage(`${result.updated ? "Updated" : "Imported"} ${result.ticker}, v${result.version}`);
+        }
       }
-      setTicker("");
+      setJsonPayload("{\n  \"ticker\": \"\",\n  \"company_name\": \"\"\n}");
       closeImport();
       await reloadAfterSubmit();
     } catch (err) {
@@ -59,12 +80,11 @@ export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModul
       }
       onMessage(err instanceof Error ? err.message : "Import failed");
     }
-  }, [closeImport, editingTicker, jsonPayload, markdownReport, onMessage, reloadAfterSubmit, ticker]);
+  }, [closeImport, editingTicker, extractTickerFromJson, isEditing, jsonPayload, markdownReport, onMessage, reloadAfterSubmit]);
 
   const openEditImport = useCallback(async (stock: Stock) => {
     onMessage("");
     setEditingTicker(stock.ticker);
-    setTicker(stock.ticker);
     if (stock.rawJson?.trim()) {
       try {
         setJsonPayload(JSON.stringify(JSON.parse(stock.rawJson), null, 2));
@@ -88,15 +108,12 @@ export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModul
 
   const openNewImport = useCallback(() => {
     setEditingTicker(null);
-    setTicker("");
-    setJsonPayload("{\n\n}");
+    setJsonPayload("{\n  \"ticker\": \"\",\n  \"company_name\": \"\"\n}");
     setMarkdownReport("# Report\n");
     setIsImportOpen(true);
   }, []);
 
   return {
-    ticker,
-    setTicker,
     jsonPayload,
     setJsonPayload,
     markdownReport,
@@ -104,6 +121,7 @@ export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModul
     isImportOpen,
     setIsImportOpen,
     editingTicker,
+    isEditing,
     closeImport,
     submitImport,
     openEditImport,

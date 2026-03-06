@@ -28,10 +28,6 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
       return res.status(400).json({ error: "Invalid payload", detail: parsed.error.flatten() });
     }
 
-    const ticker = normalizeTicker(parsed.data.ticker);
-    const originalTicker = parsed.data.originalTicker ? normalizeTicker(parsed.data.originalTicker) : ticker;
-    const isEditRequest = Boolean(parsed.data.originalTicker);
-
     let payloadObj: Record<string, unknown> | null = null;
     if (typeof parsed.data.jsonPayload === "string") {
       try {
@@ -49,6 +45,16 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
     if (!payloadObj) {
       return res.status(400).json({ error: "jsonPayload must be a JSON object" });
     }
+
+    const payloadTicker = typeof payloadObj.ticker === "string" ? payloadObj.ticker : "";
+    const resolvedTicker = payloadTicker || parsed.data.ticker || "";
+    if (!resolvedTicker.trim()) {
+      return res.status(400).json({ error: "Ticker is required in jsonPayload.ticker or payload.ticker" });
+    }
+
+    const ticker = normalizeTicker(resolvedTicker);
+    const originalTicker = parsed.data.originalTicker ? normalizeTicker(parsed.data.originalTicker) : ticker;
+    const isEditRequest = Boolean(parsed.data.originalTicker);
 
     const fields = extractStockFields(payloadObj);
     let updated = false;
@@ -127,18 +133,21 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
       where: { stockId: stock.id },
       orderBy: { version: "desc" }
     });
-    const nextVersion = (latestReport?.version ?? 0) + 1;
-    await ensureReportsDir(reportsDir);
-    const filePath = await writeReportFile(reportsDir, ticker, nextVersion, parsed.data.markdownReport);
+    let nextVersion = latestReport?.version ?? 0;
+    if (typeof parsed.data.markdownReport === "string" && parsed.data.markdownReport.trim()) {
+      nextVersion += 1;
+      await ensureReportsDir(reportsDir);
+      const filePath = await writeReportFile(reportsDir, ticker, nextVersion, parsed.data.markdownReport);
 
-    await prisma.report.create({
-      data: {
-        stockId: stock.id,
-        filePath,
-        version: nextVersion,
-        generatedAt: new Date()
-      }
-    });
+      await prisma.report.create({
+        data: {
+          stockId: stock.id,
+          filePath,
+          version: nextVersion,
+          generatedAt: new Date()
+        }
+      });
+    }
 
     return res.json({
       ticker,

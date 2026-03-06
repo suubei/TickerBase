@@ -35,10 +35,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function importStock(payload: {
-  ticker: string;
+  ticker?: string;
   originalTicker?: string;
   jsonPayload: string;
-  markdownReport: string;
+  markdownReport?: string;
   action?: "update" | "skip";
 }) {
   return request<{ ticker: string; updated: boolean; version: number } | { skipped: true; ticker: string }>(

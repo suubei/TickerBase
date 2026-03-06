@@ -163,13 +163,12 @@ function App() {
   } = useReportDetailModule({ onMessage: setMessage });
 
   const {
-    ticker,
-    setTicker,
     jsonPayload,
     setJsonPayload,
     markdownReport,
     setMarkdownReport,
     isImportOpen,
+    isEditing,
     closeImport,
     submitImport,
     openEditImport,
@@ -366,10 +365,9 @@ function App() {
 
       <ImportDialog
         isOpen={isImportOpen}
-        ticker={ticker}
+        isEditing={isEditing}
         jsonPayload={jsonPayload}
         markdownReport={markdownReport}
-        onTickerChange={setTicker}
         onJsonPayloadChange={setJsonPayload}
         onMarkdownReportChange={setMarkdownReport}
         onClose={closeImport}
