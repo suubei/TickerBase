@@ -9,11 +9,33 @@ type ReportDetailPanelProps = {
   selected: Stock | null;
   reports: ReportMeta[];
   activeReport: ActiveReport;
+  isEditingReport: boolean;
+  reportDraft: string;
+  isSavingReport: boolean;
   onClose: () => void;
   onSelectReport: (reportId: number) => void;
+  onStartEditReport: () => void;
+  onCancelEditReport: () => void;
+  onReportDraftChange: (value: string) => void;
+  onSaveEditedReport: () => void;
+  onCreateNewReportVersion: () => void;
 };
 
-export function ReportDetailPanel({ selected, reports, activeReport, onClose, onSelectReport }: ReportDetailPanelProps) {
+export function ReportDetailPanel({
+  selected,
+  reports,
+  activeReport,
+  isEditingReport,
+  reportDraft,
+  isSavingReport,
+  onClose,
+  onSelectReport,
+  onStartEditReport,
+  onCancelEditReport,
+  onReportDraftChange,
+  onSaveEditedReport,
+  onCreateNewReportVersion
+}: ReportDetailPanelProps) {
   return (
     <>
       {selected ? <div className="detail-backdrop" onClick={onClose} /> : null}
@@ -27,19 +49,42 @@ export function ReportDetailPanel({ selected, reports, activeReport, onClose, on
           <h4>历史版本</h4>
           <div className="report-list">
             {reports.map((report) => (
-              <button className="btn-ghost" key={report.id} onClick={() => onSelectReport(report.id)}>
+              <button className={`btn-ghost ${activeReport?.id === report.id ? "active" : ""}`} key={report.id} onClick={() => onSelectReport(report.id)}>
                 v{report.version} - {new Date(report.generatedAt).toLocaleString()}
               </button>
             ))}
           </div>
 
+          <div className="actions">
+            {!isEditingReport ? (
+              <button className="btn-secondary" onClick={onStartEditReport} disabled={!activeReport || isSavingReport}>编辑当前版本</button>
+            ) : (
+              <>
+                <button className="btn-secondary" onClick={onCancelEditReport} disabled={isSavingReport}>取消编辑</button>
+                <button className="btn-primary" onClick={onSaveEditedReport} disabled={isSavingReport}>保存当前版本</button>
+              </>
+            )}
+            <button className="btn-primary" onClick={onCreateNewReportVersion} disabled={isSavingReport || !activeReport}>
+              {isSavingReport ? "处理中..." : "创建新版本"}
+            </button>
+          </div>
+
           <h4>Markdown 报告 {activeReport ? `(v${activeReport.version})` : ""}</h4>
-          <article
-            className="markdown"
-            dangerouslySetInnerHTML={{
-              __html: activeReport ? (marked.parse(activeReport.content) as string) : "No report"
-            }}
-          />
+          {isEditingReport ? (
+            <textarea
+              className="report-editor"
+              value={reportDraft}
+              onChange={(e) => onReportDraftChange(e.target.value)}
+              rows={16}
+            />
+          ) : (
+            <article
+              className="markdown"
+              dangerouslySetInnerHTML={{
+                __html: activeReport ? (marked.parse(activeReport.content) as string) : "No report"
+              }}
+            />
+          )}
         </div>
       </aside>
     </>

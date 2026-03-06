@@ -159,7 +159,15 @@ function App() {
     setSelected,
     reports,
     activeReport,
-    selectReport
+    selectReport,
+    isEditingReport,
+    reportDraft,
+    setReportDraft,
+    isSavingReport,
+    startEditReport,
+    cancelEditReport,
+    saveEditedReport,
+    createNewReportVersionFromDraft
   } = useReportDetailModule({ onMessage: setMessage });
 
   const {
@@ -390,8 +398,16 @@ function App() {
         selected={selected}
         reports={reports}
         activeReport={activeReport}
+        isEditingReport={isEditingReport}
+        reportDraft={reportDraft}
+        isSavingReport={isSavingReport}
         onClose={onCloseReport}
         onSelectReport={onSelectReport}
+        onStartEditReport={startEditReport}
+        onCancelEditReport={cancelEditReport}
+        onReportDraftChange={setReportDraft}
+        onSaveEditedReport={() => void saveEditedReport()}
+        onCreateNewReportVersion={() => void createNewReportVersionFromDraft()}
       />
       </div>
     </div>

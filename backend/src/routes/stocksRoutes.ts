@@ -2,7 +2,7 @@ import express from "express";
 import fs from "node:fs/promises";
 import { PrismaClient } from "@prisma/client";
 import { withAsync } from "../lib/http";
-import { archiveSchema, importSchema, stockTagsSchema } from "../schemas";
+import { archiveSchema, importSchema, reportCreateSchema, reportUpdateSchema, stockTagsSchema } from "../schemas";
 import {
   ensureReportsDir,
   extractNameList,
@@ -328,6 +328,68 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
 
     const content = await fs.readFile(report.filePath, "utf-8");
     res.json({ content, generatedAt: report.generatedAt, version: report.version });
+  }));
+
+  router.post("/stocks/:ticker/reports", withAsync(async (req, res) => {
+    const ticker = normalizeTicker(req.params.ticker);
+    const parsed = reportCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid payload", detail: parsed.error.flatten() });
+    }
+
+    const stock = await prisma.stock.findUnique({ where: { ticker } });
+    if (!stock) {
+      return res.status(404).json({ error: "Ticker not found" });
+    }
+
+    const latestReport = await prisma.report.findFirst({
+      where: { stockId: stock.id },
+      orderBy: { version: "desc" }
+    });
+    const nextVersion = (latestReport?.version ?? 0) + 1;
+
+    await ensureReportsDir(reportsDir);
+    const filePath = await writeReportFile(reportsDir, ticker, nextVersion, parsed.data.content);
+    const created = await prisma.report.create({
+      data: {
+        stockId: stock.id,
+        filePath,
+        version: nextVersion,
+        generatedAt: new Date()
+      }
+    });
+
+    res.status(201).json(created);
+  }));
+
+  router.put("/reports/:id/content", withAsync(async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ error: "Invalid report id" });
+    }
+
+    const parsed = reportUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid payload", detail: parsed.error.flatten() });
+    }
+
+    const report = await prisma.report.findUnique({ where: { id } });
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    await fs.writeFile(report.filePath, parsed.data.content, "utf-8");
+    const updated = await prisma.report.update({
+      where: { id },
+      data: { generatedAt: new Date() }
+    });
+
+    res.json({
+      id: updated.id,
+      version: updated.version,
+      generatedAt: updated.generatedAt,
+      content: parsed.data.content
+    });
   }));
 
   return router;

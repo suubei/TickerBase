@@ -41,3 +41,11 @@ export const tableFieldSchema = z.object({
 export const tableFieldsUpdateSchema = z.object({
   fields: z.array(tableFieldSchema)
 });
+
+export const reportCreateSchema = z.object({
+  content: z.string().min(1)
+});
+
+export const reportUpdateSchema = z.object({
+  content: z.string().min(1)
+});

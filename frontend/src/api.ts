@@ -98,6 +98,20 @@ export async function getReportContent(reportId: number) {
   return request<{ content: string; generatedAt: string; version: number }>(`/reports/${reportId}/content`);
 }
 
+export async function createReportVersion(ticker: string, content: string) {
+  return request<ReportMeta>(`/stocks/${ticker}/reports`, {
+    method: "POST",
+    body: JSON.stringify({ content })
+  });
+}
+
+export async function updateReportContent(reportId: number, content: string) {
+  return request<{ id: number; content: string; generatedAt: string; version: number }>(`/reports/${reportId}/content`, {
+    method: "PUT",
+    body: JSON.stringify({ content })
+  });
+}
+
 export async function createWatchlist(name: string, tickers: string[]) {
   return request<Watchlist>("/watchlists", {
     method: "POST",

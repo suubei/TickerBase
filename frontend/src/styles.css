@@ -1106,6 +1106,20 @@ td button {
   gap: 6px;
 }
 
+.report-list .btn-ghost.active {
+  background: #f3efe6;
+  border-color: #d9cfba;
+  color: #473f2f;
+}
+
+.report-editor {
+  width: 100%;
+  min-height: 320px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .markdown {
   background: #fffaf0;
   border: 1px solid #e4dac6;
