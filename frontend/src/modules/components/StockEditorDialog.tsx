@@ -39,9 +39,9 @@ export function StockEditorDialog({
         <div className="dialog-header">
           <div>
             <h2>{isEditing ? "Edit Stock" : "Create Stock"}</h2>
-            <p className="stock-editor-subtitle">
-              {isEditing ? "Update existing record fields" : "Paste JSON data and optionally a Markdown report"}
-            </p>
+            {isEditing && (
+              <p className="stock-editor-subtitle">Update existing record fields</p>
+            )}
           </div>
           <button className="btn-close stock-editor-close" aria-label="Close dialog" onClick={onClose}>✕</button>
         </div>
