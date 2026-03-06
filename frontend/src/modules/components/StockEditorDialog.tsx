@@ -61,7 +61,6 @@ export function StockEditorDialog({
             <div className="stock-editor-pane">
               <div className="stock-editor-pane-head">
                 <span className="stock-editor-pane-label">JSON</span>
-                <span className="stock-editor-pane-desc">Defines record fields</span>
               </div>
               <textarea
                 className="stock-editor-textarea"
