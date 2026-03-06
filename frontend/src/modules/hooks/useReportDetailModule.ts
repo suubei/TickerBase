@@ -102,7 +102,7 @@ export function useReportDetailModule({ onMessage }: UseReportDetailModuleOption
     try {
       const created = await createReportVersion(selected.ticker, content);
       await loadReportsForTicker(selected.ticker, created.id);
-      setIsEditingReport(false);
+      setIsEditingReport(true);
       onMessage(`Created report v${created.version}`);
     } catch (err) {
       onMessage(err instanceof Error ? err.message : "Failed to create report version");

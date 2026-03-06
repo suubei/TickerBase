@@ -104,10 +104,7 @@ export function WatchlistModule({
                           className={`watchlist-ticker-row ${activeChartTicker === tickerItem ? "active" : ""}`}
                           key={`w-ticker-${item.id}-${tickerItem}`}
                           draggable
-                          onContextMenu={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                          }}
+                          onContextMenu={(event) => openContextMenu(event, item.id)}
                           onDragStart={(event) => {
                             dragState.current = { type: "stock", watchlistId: item.id, ticker: tickerItem };
                             event.dataTransfer.effectAllowed = "move";
