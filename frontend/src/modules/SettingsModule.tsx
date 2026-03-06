@@ -56,58 +56,8 @@ export function SettingsModule(props: SettingsModuleProps) {
 
       <div className="settings-grid">
 
-        {/* ── Themes ── */}
-        <section className="settings-card">
-          <div className="settings-card-head">
-            <h3>Themes</h3>
-            <span className="settings-count">{themeEdits.length}</span>
-          </div>
-          <div className="settings-add-row">
-            <input className="settings-add-input" placeholder="Theme name" value={newThemeName} onChange={(e) => onNewThemeNameChange(e.target.value)} />
-            <input type="color" className="settings-color-input" value={newThemeColor} onChange={(e) => onNewThemeColorChange(e.target.value)} />
-            <button className="btn-primary settings-add-btn" onClick={onCreateTheme}>+ Add</button>
-          </div>
-          <div className="settings-list">
-            {themeEdits.length === 0 && <div className="settings-empty">No themes yet</div>}
-            {themeEdits.map((item) => (
-              <div className="settings-list-item" key={item.id}>
-                <input className="settings-item-input" value={item.name} onChange={(e) => onThemeEditChange(item.id, { name: e.target.value })} />
-                <input type="color" className="settings-color-input" value={item.color} onChange={(e) => onThemeEditChange(item.id, { color: e.target.value })} />
-                <div className="settings-item-actions">
-                  <button className="btn-secondary" onClick={() => onSaveTheme(item.id, item.name, item.color)}>Save</button>
-                  <button className="settings-delete-btn" onClick={() => onDeleteTheme(item.id)}>✕</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Categories ── */}
-        <section className="settings-card">
-          <div className="settings-card-head">
-            <h3>Categories</h3>
-            <span className="settings-count">{categoryEdits.length}</span>
-          </div>
-          <div className="settings-add-row">
-            <input className="settings-add-input" placeholder="Category name" value={newCategoryName} onChange={(e) => onNewCategoryNameChange(e.target.value)} />
-            <button className="btn-primary settings-add-btn" onClick={onCreateCategory}>+ Add</button>
-          </div>
-          <div className="settings-list">
-            {categoryEdits.length === 0 && <div className="settings-empty">No categories yet</div>}
-            {categoryEdits.map((item) => (
-              <div className="settings-list-item" key={item.id}>
-                <input className="settings-item-input" value={item.name} onChange={(e) => onCategoryEditChange(item.id, e.target.value)} />
-                <div className="settings-item-actions">
-                  <button className="btn-secondary" onClick={() => onSaveCategory(item.id, item.name)}>Save</button>
-                  <button className="settings-delete-btn" onClick={() => onDeleteCategory(item.id)}>✕</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* ── Table Column Fields ── */}
-        <section className="settings-card settings-card-wide">
+        <section className="settings-card">
           <div className="settings-card-head">
             <h3>Table Column Fields</h3>
           </div>
