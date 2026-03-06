@@ -20,9 +20,9 @@ export type ColumnConfig = {
 export const defaultCoreColumns: ColumnConfig[] = [
   { key: "ticker", label: "股票代码", source: "core" },
   { key: "category", label: "板块", source: "core" },
-  { key: "summary", label: "定位", source: "core" },
   { key: "theme", label: "主题", source: "core" },
   { key: "themePhase", label: "主题阶段", source: "core" },
+  { key: "summary", label: "定位", source: "core" },
   { key: "themeBenefit", label: "主题受益", source: "core" },
   { key: "catalyst", label: "核心催化剂", source: "core" },
   { key: "risk", label: "最大风险", source: "core" },
