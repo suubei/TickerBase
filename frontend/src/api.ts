@@ -129,6 +129,13 @@ export async function removeTickerFromWatchlist(watchlistId: number, ticker: str
   });
 }
 
+export async function addTickerToWatchlist(watchlistId: number, ticker: string) {
+  return request<{ id: number; ticker: string }>(`/watchlists/${watchlistId}/stocks`, {
+    method: "POST",
+    body: JSON.stringify({ ticker })
+  });
+}
+
 export async function deleteWatchlist(watchlistId: number) {
   return request<void>(`/watchlists/${watchlistId}`, {
     method: "DELETE"

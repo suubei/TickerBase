@@ -119,7 +119,12 @@ function App() {
     loadWatchlists,
     removeFromWatchlist,
     removeWatchlist,
-    exportActiveWatchlist
+    exportActiveWatchlist,
+    exportWatchlistCsv,
+    addSymbol,
+    reorderWatchlists,
+    reorderStockWithinWatchlist,
+    moveStockBetweenWatchlists
   } = useWatchlistModule(setMessage);
 
   const {
@@ -342,6 +347,11 @@ function App() {
           onSelectTicker={setActiveChartTicker}
           onRemoveTicker={onRemoveTicker}
           onExportActiveWatchlist={exportActiveWatchlist}
+          onExportWatchlistCsv={exportWatchlistCsv}
+          onAddSymbol={addSymbol}
+          onReorderWatchlists={reorderWatchlists}
+          onReorderStocks={reorderStockWithinWatchlist}
+          onMoveStock={moveStockBetweenWatchlists}
           renderChart={(symbol) => <TradingViewAdvancedChart symbol={symbol} />}
         />
       ) : null}

@@ -514,6 +514,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fcfcfb;
+  cursor: grab;
 }
 
 .watchlist-accordion-trigger {
@@ -554,6 +555,41 @@ button {
   grid-template-columns: 1fr auto;
   gap: 6px;
   align-items: center;
+  cursor: grab;
+}
+
+.watchlist-context-menu {
+  position: fixed;
+  z-index: 90;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+}
+
+.watchlist-context-menu button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: #111827;
+  border-radius: 0;
+}
+
+.watchlist-context-menu button:hover {
+  background: #f3f4f6;
+}
+
+.watchlist-context-menu button.danger {
+  color: #b42318;
+}
+
+.watchlist-context-menu button.danger:hover {
+  background: #fff1f1;
 }
 
 .icon-delete {

@@ -17,6 +17,10 @@ export const watchlistSchema = z.object({
   tickers: z.array(z.string().min(1)).min(1)
 });
 
+export const watchlistAddStockSchema = z.object({
+  ticker: z.string().min(1)
+});
+
 export const stockTagsSchema = z.object({
   themes: z.array(z.string().min(1)),
   categories: z.array(z.string().min(1))

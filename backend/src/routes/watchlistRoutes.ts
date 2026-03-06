@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { withAsync } from "../lib/http";
-import { watchlistSchema } from "../schemas";
+import { watchlistAddStockSchema, watchlistSchema } from "../schemas";
 import { normalizeTicker } from "../services/stockService";
 
 type WatchlistRoutesOptions = {
@@ -102,7 +102,58 @@ export function createWatchlistRoutes({ prisma }: WatchlistRoutesOptions) {
       }
     });
 
+    const remainingCount = await prisma.watchlistStock.count({
+      where: { watchlistId: id }
+    });
+    if (remainingCount === 0) {
+      await prisma.watchlist.delete({ where: { id } });
+    }
+
     return res.status(204).send();
+  }));
+
+  router.post("/watchlists/:id/stocks", withAsync(async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ error: "Invalid watchlist id" });
+    }
+
+    const parsed = watchlistAddStockSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid payload" });
+    }
+
+    const watchlist = await prisma.watchlist.findUnique({ where: { id } });
+    if (!watchlist) {
+      return res.status(404).json({ error: "Watchlist not found" });
+    }
+
+    const ticker = normalizeTicker(parsed.data.ticker);
+    const stock = await prisma.stock.findUnique({ where: { ticker } });
+    if (!stock) {
+      return res.status(404).json({ error: "Stock not found" });
+    }
+
+    const exists = await prisma.watchlistStock.findUnique({
+      where: {
+        watchlistId_stockId: {
+          watchlistId: id,
+          stockId: stock.id
+        }
+      }
+    });
+    if (exists) {
+      return res.status(409).json({ error: "Stock already in watchlist" });
+    }
+
+    await prisma.watchlistStock.create({
+      data: {
+        watchlistId: id,
+        stockId: stock.id
+      }
+    });
+
+    return res.status(201).json({ id, ticker });
   }));
 
   router.delete("/watchlists/:id", withAsync(async (req, res) => {
