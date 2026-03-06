@@ -9,7 +9,7 @@ type UseStockEditorModuleOptions = {
 
 export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockEditorModuleOptions) {
   const [jsonPayload, setJsonPayload] = useState("");
-  const [markdownReport, setMarkdownReport] = useState("# Report\n");
+  const [markdownReport, setMarkdownReport] = useState("");
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
 
@@ -108,7 +108,7 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
       ...(stock.categories.length > 0 && { categories: stock.categories }),
     };
     setJsonPayload(JSON.stringify(merged, null, 2));
-    setMarkdownReport("# Report\n");
+    setMarkdownReport("");
     setIsEditorOpen(true);
 
     if (!stock.latestReport) return;
@@ -123,7 +123,7 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
   const openCreateStock = useCallback(() => {
     setEditingTicker(null);
     setJsonPayload("");
-    setMarkdownReport("# Report\n");
+    setMarkdownReport("");
     setIsEditorOpen(true);
   }, []);
 
