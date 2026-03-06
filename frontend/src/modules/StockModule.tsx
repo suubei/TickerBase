@@ -64,6 +64,7 @@ type StockModuleProps = {
 };
 
 export function StockModule(props: StockModuleProps) {
+
   const {
     toast,
     pageSize,
@@ -219,7 +220,9 @@ export function StockModule(props: StockModuleProps) {
                     const value = column.source === "core" ? getCoreValue(stock, column.key) : raw[column.key];
                     if (column.key === "theme") {
                       return (
-                        <td key={column.key} onDoubleClick={(event) => onOpenTagDropdown(stock, "theme", event)} onClick={(event) => event.stopPropagation()}>
+                        <td key={column.key}
+                          onContextMenu={(event) => { event.preventDefault(); onOpenTagDropdown(stock, "theme", event); }}
+                        >
                           <div className="chip-list">
                             {stock.themes.length > 0
                               ? stock.themes.map((item) => <span key={`${stock.id}-theme-${item}`} className="chip chip-theme">{item}</span>)
@@ -231,7 +234,9 @@ export function StockModule(props: StockModuleProps) {
 
                     if (column.key === "category") {
                       return (
-                        <td key={column.key} onDoubleClick={(event) => onOpenTagDropdown(stock, "category", event)} onClick={(event) => event.stopPropagation()}>
+                        <td key={column.key}
+                          onContextMenu={(event) => { event.preventDefault(); onOpenTagDropdown(stock, "category", event); }}
+                        >
                           <div className="chip-list">
                             {stock.categories.length > 0
                               ? stock.categories.map((item) => <span key={`${stock.id}-category-${item}`} className="chip chip-category">{item}</span>)
