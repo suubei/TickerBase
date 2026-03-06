@@ -166,9 +166,10 @@ export function WatchlistModule({
                             className={`watchlist-ticker-row${isActive ? " active" : ""}${isSDO ? " wl-stock-dragover" : ""}`}
                             key={`w-ticker-${item.id}-${tickerItem}`}
                             draggable
-                            onContextMenu={(event) =>
-                              openStockContextMenu(event, item.id, tickerItem)
-                            }
+                            onContextMenu={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                            }}
                             onDragStart={(event) => {
                               event.stopPropagation();
                               dragState.current = { type: "stock", watchlistId: item.id, ticker: tickerItem };
