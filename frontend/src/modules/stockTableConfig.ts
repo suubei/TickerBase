@@ -57,7 +57,7 @@ export function getCoreValue(stock: Stock, key: string): unknown {
 
 export function formatCellValue(key: string, value: unknown): string {
   if (key === "updatedAt") {
-    return value ? new Date(String(value)).toLocaleString() : "-";
+    return value ? new Date(String(value)).toLocaleDateString() : "-";
   }
   if (typeof value === "number") return String(value);
   if (typeof value === "string") return value;
