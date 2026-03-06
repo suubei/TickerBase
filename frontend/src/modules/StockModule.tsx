@@ -227,7 +227,7 @@ export function StockModule(props: StockModuleProps) {
                     if (column.key === "theme") {
                       return (
                         <td key={column.key}
-                          onContextMenu={(event) => { event.preventDefault(); onOpenTagDropdown(stock, "theme", event); }}
+                          onClick={(event) => { event.stopPropagation(); onOpenTagDropdown(stock, "theme", event); }}
                         >
                           <div className="chip-list">
                             {stock.themes.length > 0
@@ -241,7 +241,7 @@ export function StockModule(props: StockModuleProps) {
                     if (column.key === "category") {
                       return (
                         <td key={column.key}
-                          onContextMenu={(event) => { event.preventDefault(); onOpenTagDropdown(stock, "category", event); }}
+                          onClick={(event) => { event.stopPropagation(); onOpenTagDropdown(stock, "category", event); }}
                         >
                           <div className="chip-list">
                             {stock.categories.length > 0
