@@ -9,7 +9,6 @@ type WatchlistModuleProps = {
   onDeleteWatchlist: (id: number) => void;
   onSelectTicker: (ticker: string) => void;
   onRemoveTicker: (watchlistId: number, ticker: string) => void;
-  onExportActiveWatchlist: () => void;
   onExportWatchlistCsv: (watchlistId: number) => void;
   onAddSymbol: (watchlistId: number, ticker: string) => void;
   onReorderWatchlists: (fromId: number, toId: number) => void;
@@ -26,7 +25,6 @@ export function WatchlistModule({
   onDeleteWatchlist,
   onSelectTicker,
   onRemoveTicker,
-  onExportActiveWatchlist,
   onExportWatchlistCsv,
   onAddSymbol,
   onReorderWatchlists,
@@ -59,8 +57,11 @@ export function WatchlistModule({
           <h3>{activeChartTicker ? `Chart: ${activeChartTicker}` : "Chart"}</h3>
           {renderChart(activeChartTicker)}
         </div>
-        <div className="watchlist-box">
-          <h3>Watchlist 列表</h3>
+        <div className="watchlist-box watchlist-sidebox">
+          <div className="watchlist-list-header">
+            <span>Watchlists</span>
+            <small>Right-click a watchlist to manage</small>
+          </div>
           <div className="watchlist-accordion">
             {watchlists.map((item) => {
               const expanded = expandedWatchlistId === item.id;
@@ -91,18 +92,10 @@ export function WatchlistModule({
                 >
                   <div className={`watchlist-accordion-trigger ${expanded ? "expanded" : ""}`} onContextMenu={(event) => openContextMenu(event, item.id)}>
                     <button className="watchlist-accordion-toggle" onClick={() => onToggleWatchlist(item.id)}>
+                      <span className="watchlist-drag-handle">⠿</span>
+                      <span className={`watchlist-caret ${expanded ? "expanded" : ""}`}>▶</span>
                       <span>{item.name}</span>
-                      <span>{expanded ? "−" : "+"}</span>
-                    </button>
-                    <button
-                      className="icon-delete"
-                      aria-label={`Delete watchlist ${item.name}`}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onDeleteWatchlist(item.id);
-                      }}
-                    >
-                      ×
+                      <span className="watchlist-count">{item.tickers.length}</span>
                     </button>
                   </div>
                   {expanded ? (
@@ -142,12 +135,13 @@ export function WatchlistModule({
                           }}
                         >
                           <button
-                            className={`btn-ghost ${activeChartTicker === tickerItem ? "active" : ""}`}
+                            className={`watchlist-stock-btn ${activeChartTicker === tickerItem ? "active" : ""}`}
                             onClick={(event) => {
                               event.stopPropagation();
                               onSelectTicker(tickerItem);
                             }}
                           >
+                            <span className="watchlist-drag-handle">⠿</span>
                             {tickerItem}
                           </button>
                           <button
@@ -167,9 +161,6 @@ export function WatchlistModule({
                 </section>
               );
             })}
-          </div>
-          <div className="actions">
-            <button className="btn-secondary" onClick={onExportActiveWatchlist}>导出 TradingView 文本</button>
           </div>
         </div>
       </div>

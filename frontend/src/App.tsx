@@ -119,7 +119,6 @@ function App() {
     loadWatchlists,
     removeFromWatchlist,
     removeWatchlist,
-    exportActiveWatchlist,
     exportWatchlistCsv,
     addSymbol,
     reorderWatchlists,
@@ -346,7 +345,6 @@ function App() {
           onDeleteWatchlist={onDeleteWatchlist}
           onSelectTicker={setActiveChartTicker}
           onRemoveTicker={onRemoveTicker}
-          onExportActiveWatchlist={exportActiveWatchlist}
           onExportWatchlistCsv={exportWatchlistCsv}
           onAddSymbol={addSymbol}
           onReorderWatchlists={reorderWatchlists}
