@@ -6,3 +6,4 @@ backend/dev.db-journal
 backend/dist
 frontend/dist
 .DS_Store
+frontend/demo/
