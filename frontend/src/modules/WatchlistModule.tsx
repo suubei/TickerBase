@@ -276,7 +276,7 @@ export function WatchlistModule({
                   setCtxMenu(null);
                 }}
               >
-                ＋ Add Symbol
+                ＋ Add Ticker
               </button>
               <button
                 onClick={() => {
@@ -310,7 +310,7 @@ export function WatchlistModule({
           >
             <div className="wl-add-header">
               <span className="wl-add-title">
-                Add Symbol
+                Add Ticker
                 {watchlists.find((w) => w.id === addSymbolModal.watchlistId)?.name
                   ? ` — ${watchlists.find((w) => w.id === addSymbolModal.watchlistId)!.name}`
                   : ""}
@@ -332,7 +332,7 @@ export function WatchlistModule({
                   className="wl-search-input"
                   value={newSymbol}
                   onChange={(event) => setNewSymbol(event.target.value)}
-                  placeholder="Enter ticker symbol (e.g. NVDA)"
+                  placeholder="Enter ticker (e.g. NVDA)"
                   onKeyDown={(event) => {
                     if (event.key === "Enter" && newSymbol.trim()) {
                       onAddSymbol(addSymbolModal.watchlistId, newSymbol.trim().toUpperCase());
