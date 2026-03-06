@@ -36,7 +36,6 @@ export function TagEditorDropdown({
     <div className="tag-dropdown-backdrop" onClick={onClose}>
       <section
         className="tag-dropdown-panel"
-        style={{ left: `${tagDropdown.left}px`, top: `${tagDropdown.top}px` }}
         onClick={(e) => e.stopPropagation()}
       >
         <h4>{tagDropdown.kind === "theme" ? "编辑 Themes" : "编辑 Categories"}</h4>
