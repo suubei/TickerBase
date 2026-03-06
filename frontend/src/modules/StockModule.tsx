@@ -147,9 +147,7 @@ export function StockModule(props: StockModuleProps) {
 
       <div className="toolbar toolbar-main module2-filters">
         <div className="module2-search-wrap">
-          <span className="module2-search-icon">⌕</span>
-          <input value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search stocks…" />
-          {search && <button className="module2-search-clear" onClick={() => onSearchChange("")}>✕</button>}
+          <input className="module2-search-input" value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search stocks…" />
         </div>
         <select value={categoryFilter} onChange={(e) => onCategoryFilterChange(e.target.value)}>
           <option value="">All categories</option>

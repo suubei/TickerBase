@@ -520,7 +520,7 @@ button {
   border-bottom: 1px solid var(--line);
 }
 
-.module2-filters input {
+.module2-filters input:not(.module2-search-input) {
   min-width: 220px;
 }
 
@@ -537,10 +537,6 @@ button {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.module2-search-wrap:focus-within {
-  border-color: var(--line-accent);
-  box-shadow: 0 0 0 2px var(--focus-ring);
-}
 
 .module2-search-icon {
   color: var(--text-muted);
@@ -583,7 +579,7 @@ button {
   color: var(--text-soft);
 }
 
-.module2-panel input:not([type="checkbox"]),
+.module2-panel input:not([type="checkbox"]):not(.module2-search-input),
 .module2-panel select {
   height: 34px;
   border: 1px solid var(--line-strong);

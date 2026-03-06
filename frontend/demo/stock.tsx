@@ -197,9 +197,6 @@ export default function App() {
             placeholder="Search stocks…"
             style={{ border: "none", background: "none", outline: "none", fontSize: 13, color: C.subtle, width: 190 }}
           />
-          {search && (
-            <button onClick={() => setSearch("")} style={{ background: "none", border: "none", cursor: "pointer", color: C.muted, fontSize: 12, padding: 0, lineHeight: 1 }}>✕</button>
-          )}
         </div>
         {/* Dropdowns */}
         {["All categories", "All themes", "All watchlists"].map(ph => (
