@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { marked } from "marked";
 import type { ReportMeta, Stock } from "../../types";
 
@@ -36,64 +37,173 @@ export function ReportDetailPanel({
   onSaveEditedReport,
   onCreateNewReportVersion
 }: ReportDetailPanelProps) {
+  const [showPreview, setShowPreview] = useState(true);
+
   const sortedReports = [...reports].sort((a, b) => {
     if (b.version !== a.version) return b.version - a.version;
     return new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime();
   });
 
+  const latestReportId = sortedReports[0]?.id ?? null;
+  const activeReportMeta = sortedReports.find((r) => r.id === activeReport?.id) ?? null;
+
   return (
     <>
       {selected ? <div className="detail-backdrop" onClick={onClose} /> : null}
       <aside className={`detail-panel ${selected ? "open" : ""}`}>
-        <div className="detail-header">
-          <h3>详细报告 - {selected?.ticker ?? ""}</h3>
-          <button className="btn-close" aria-label="Close panel" onClick={onClose}>×</button>
-        </div>
+        <div className="detail-inner">
 
-        <div className="detail-body detail-split">
-          <section className="detail-sidebar">
-            <h4>历史版本</h4>
-            <div className="report-list">
-              {sortedReports.map((report) => (
-                <button className={`report-version-btn ${activeReport?.id === report.id ? "active" : ""}`} key={report.id} onClick={() => onSelectReport(report.id)}>
-                  v{report.version} - {new Date(report.generatedAt).toLocaleString()}
-                </button>
-              ))}
+          {/* ── Left sidebar: version list ── */}
+          <div className="detail-vs">
+            <div className="detail-vs-head">
+              <p className="detail-vs-label">Report</p>
+              <h3 className="detail-vs-title">
+                {selected?.ticker ?? ""}
+                {selected?.companyName ? ` — ${selected.companyName}` : ""}
+              </h3>
             </div>
-          </section>
-
-          <section className="detail-content">
-            <div className="actions report-actions">
-              {!isEditingReport ? (
-                <button className="btn-secondary" onClick={onStartEditReport} disabled={!activeReport || isSavingReport}>编辑当前版本</button>
-              ) : (
-                <>
-                  <button className="btn-secondary" onClick={onCancelEditReport} disabled={isSavingReport}>取消编辑</button>
-                  <button className="btn-primary" onClick={onSaveEditedReport} disabled={isSavingReport}>保存当前版本</button>
-                </>
+            <div className="detail-vs-list">
+              {sortedReports.map((report) => {
+                const isActive = activeReport?.id === report.id;
+                const isLatest = report.id === latestReportId;
+                return (
+                  <button
+                    key={report.id}
+                    className={`detail-vbtn ${isActive ? "active" : ""}`}
+                    onClick={() => onSelectReport(report.id)}
+                  >
+                    <div className="detail-vbtn-row">
+                      <span className="detail-vbtn-name">Version {report.version}</span>
+                      {isLatest && (
+                        <span className="detail-badge detail-badge-latest">Latest</span>
+                      )}
+                    </div>
+                    <p className="detail-vbtn-date">
+                      {new Date(report.generatedAt).toLocaleString()}
+                    </p>
+                  </button>
+                );
+              })}
+              {sortedReports.length === 0 && (
+                <div style={{ padding: "24px 16px", fontSize: 12, color: "var(--text-muted)", textAlign: "center" }}>
+                  No reports
+                </div>
               )}
-              <button className="btn-primary" onClick={onCreateNewReportVersion} disabled={isSavingReport || !activeReport}>
-                {isSavingReport ? "处理中..." : "创建新版本"}
-              </button>
+            </div>
+          </div>
+
+          {/* ── Main area ── */}
+          <div className="detail-main">
+
+            {/* Toolbar */}
+            <div className="detail-toolbar">
+              <div className="detail-toolbar-left">
+                <span className="detail-toolbar-ver">
+                  {activeReport ? `Version ${activeReport.version}` : "No report selected"}
+                </span>
+                {activeReportMeta && (
+                  <span className="detail-toolbar-date">
+                    {new Date(activeReportMeta.generatedAt).toLocaleString()}
+                  </span>
+                )}
+                {activeReport && activeReport.id === latestReportId && (
+                  <span className="detail-badge detail-badge-latest">Latest</span>
+                )}
+                {isEditingReport && (
+                  <span className="detail-badge detail-badge-editing">Editing</span>
+                )}
+              </div>
+
+              <div className="detail-toolbar-right">
+                {isEditingReport ? (
+                  <>
+                    <button
+                      className={`detail-tbtn ${showPreview ? "active" : ""}`}
+                      onClick={() => setShowPreview((p) => !p)}
+                    >
+                      {showPreview ? "Hide Preview" : "Show Preview"}
+                    </button>
+                    <button
+                      className="detail-tbtn"
+                      onClick={onCancelEditReport}
+                      disabled={isSavingReport}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="detail-tbtn-primary"
+                      onClick={onSaveEditedReport}
+                      disabled={isSavingReport}
+                    >
+                      Save
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className="detail-tbtn"
+                      onClick={onStartEditReport}
+                      disabled={!activeReport || isSavingReport}
+                    >
+                      ✎ Edit
+                    </button>
+                    <button
+                      className="detail-tbtn-primary"
+                      onClick={onCreateNewReportVersion}
+                      disabled={isSavingReport || !activeReport}
+                    >
+                      {isSavingReport ? "Processing…" : "+ New Version"}
+                    </button>
+                  </>
+                )}
+                <button className="btn-close" aria-label="Close panel" onClick={onClose}>×</button>
+              </div>
             </div>
 
-            <h4>Markdown 报告 {activeReport ? `(v${activeReport.version})` : ""}</h4>
+            {/* Content */}
             {isEditingReport ? (
-              <textarea
-                className="report-editor"
-                value={reportDraft}
-                onChange={(e) => onReportDraftChange(e.target.value)}
-                rows={16}
-              />
+              <div className="detail-editor-split">
+                {/* Editor pane */}
+                <div className={`detail-editor-pane ${showPreview ? "" : "full"}`}>
+                  <div className="detail-pane-label">Editor</div>
+                  <textarea
+                    className="detail-editor-textarea"
+                    value={reportDraft}
+                    onChange={(e) => onReportDraftChange(e.target.value)}
+                    spellCheck={false}
+                  />
+                </div>
+                {/* Preview pane */}
+                {showPreview && (
+                  <div className="detail-preview-pane">
+                    <div className="detail-pane-label">Preview</div>
+                    <div className="detail-preview-scroll">
+                      <article
+                        className="markdown"
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(reportDraft) as string
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
-              <article
-                className="markdown"
-                dangerouslySetInnerHTML={{
-                  __html: activeReport ? (marked.parse(activeReport.content) as string) : "No report"
-                }}
-              />
+              <div className="detail-view-scroll">
+                <div className="detail-view-content">
+                  <article
+                    className="markdown"
+                    dangerouslySetInnerHTML={{
+                      __html: activeReport
+                        ? (marked.parse(activeReport.content) as string)
+                        : "<p style='color:var(--text-muted)'>Select a report version to view.</p>"
+                    }}
+                  />
+                </div>
+              </div>
             )}
-          </section>
+          </div>
+
         </div>
       </aside>
     </>
