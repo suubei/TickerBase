@@ -245,10 +245,7 @@ export function StockModule(props: StockModuleProps) {
                       return (
                         <td key={column.key} className="ticker-cell">
                           <div className="ticker-cell-wrap">
-                            <div>
-                              <div className="ticker-cell-label">{formatCellValue(column.key, value)}</div>
-                              {stock.companyName && <div className="ticker-cell-name">{stock.companyName}</div>}
-                            </div>
+                            <div className="ticker-cell-label">{formatCellValue(column.key, value)}</div>
                             {stock.isArchived && <span className="ticker-archived-badge">Archived</span>}
                           </div>
                         </td>
