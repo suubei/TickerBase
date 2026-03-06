@@ -284,7 +284,7 @@ export function WatchlistModule({
                   setCtxMenu(null);
                 }}
               >
-                ↓ Export CSV
+                ↓ Export
               </button>
               <div className="watchlist-ctx-sep" />
               <button
