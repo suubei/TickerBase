@@ -133,12 +133,12 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
   const exportWatchlistCsv = useCallback((watchlistId: number) => {
     const target = watchlistsWithStockOrder.find((item) => item.id === watchlistId);
     if (!target) return;
-    const rows = ["Ticker", ...target.tickers].join("\n");
-    const blob = new Blob([rows], { type: "text/csv;charset=utf-8" });
+    const rows = target.tickers.join("\n");
+    const blob = new Blob([rows], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `${target.name}_${new Date().toISOString().slice(0, 10)}.csv`;
+    anchor.download = `watchlist_${new Date().toISOString().slice(0, 10)}.txt`;
     anchor.click();
     URL.revokeObjectURL(url);
   }, [watchlistsWithStockOrder]);

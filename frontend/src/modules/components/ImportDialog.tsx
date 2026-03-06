@@ -37,7 +37,7 @@ export function ImportDialog({
     <div className="dialog-backdrop" onClick={onClose}>
       <section className={`dialog-panel import-dialog ${isEditing ? "edit-mode" : "create-mode"}`} onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h2>{isEditing ? "Edit Record" : "Create Record"}</h2>
+          <h2>{isEditing ? "Edit" : "Create"}</h2>
           <button className="btn-close import-close" aria-label="Close dialog" onClick={onClose}>✕</button>
         </div>
 
@@ -54,7 +54,6 @@ export function ImportDialog({
               rows={16}
               spellCheck={false}
             />
-            <div className="import-hint">Required: <code>ticker</code></div>
           </div>
         ) : (
           <div className="import-panes">
@@ -70,7 +69,6 @@ export function ImportDialog({
                 rows={16}
                 spellCheck={false}
               />
-              <div className="import-hint">Required: <code>ticker</code></div>
             </div>
             <div className="import-pane">
               <div className="import-pane-head">

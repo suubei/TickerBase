@@ -33,6 +33,8 @@ export function WatchlistModule({
   renderChart
 }: WatchlistModuleProps) {
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; watchlistId: number } | null>(null);
+  const [addSymbolModal, setAddSymbolModal] = useState<{ watchlistId: number } | null>(null);
+  const [newSymbol, setNewSymbol] = useState("");
   const dragState = useRef<{ type: "watchlist" | "stock"; watchlistId: number; ticker?: string } | null>(null);
 
   useEffect(() => {
@@ -49,12 +51,8 @@ export function WatchlistModule({
 
   return (
     <section className="panel">
-      <div className="panel-head">
-        <h2>模块4: watchlist module</h2>
-      </div>
       <div className="watchlist-layout">
         <div className="watchlist-box watchlist-chart-box">
-          <h3>{activeChartTicker ? `Chart: ${activeChartTicker}` : "Chart"}</h3>
           {renderChart(activeChartTicker)}
         </div>
         <div className="watchlist-box watchlist-sidebox">
@@ -69,6 +67,7 @@ export function WatchlistModule({
                 <section
                   className="watchlist-accordion-item"
                   key={item.id}
+                  onContextMenu={(event) => openContextMenu(event, item.id)}
                   draggable
                   onDragStart={(event) => {
                     dragState.current = { type: "watchlist", watchlistId: item.id };
@@ -90,7 +89,7 @@ export function WatchlistModule({
                     dragState.current = null;
                   }}
                 >
-                  <div className={`watchlist-accordion-trigger ${expanded ? "expanded" : ""}`} onContextMenu={(event) => openContextMenu(event, item.id)}>
+                  <div className={`watchlist-accordion-trigger ${expanded ? "expanded" : ""}`}>
                     <button className="watchlist-accordion-toggle" onClick={() => onToggleWatchlist(item.id)}>
                       <span className="watchlist-drag-handle">⠿</span>
                       <span className={`watchlist-caret ${expanded ? "expanded" : ""}`}>▶</span>
@@ -102,7 +101,7 @@ export function WatchlistModule({
                     <div className="watchlist-tickers">
                       {item.tickers.map((tickerItem) => (
                         <div
-                          className="watchlist-ticker-row"
+                          className={`watchlist-ticker-row ${activeChartTicker === tickerItem ? "active" : ""}`}
                           key={`w-ticker-${item.id}-${tickerItem}`}
                           draggable
                           onContextMenu={(event) => {
@@ -168,10 +167,8 @@ export function WatchlistModule({
         <div className="watchlist-context-menu" style={{ left: ctxMenu.x, top: ctxMenu.y }} onClick={(event) => event.stopPropagation()}>
           <button
             onClick={() => {
-              const input = window.prompt("Add Symbol (Ticker)");
-              if (input?.trim()) {
-                onAddSymbol(ctxMenu.watchlistId, input.trim());
-              }
+              setAddSymbolModal({ watchlistId: ctxMenu.watchlistId });
+              setNewSymbol("");
               setCtxMenu(null);
             }}
           >
@@ -183,7 +180,7 @@ export function WatchlistModule({
               setCtxMenu(null);
             }}
           >
-            Export CSV
+            Export
           </button>
           <button
             className="danger"
@@ -194,6 +191,41 @@ export function WatchlistModule({
           >
             Delete Watchlist
           </button>
+        </div>
+      ) : null}
+
+      {addSymbolModal ? (
+        <div className="dialog-backdrop" onClick={() => setAddSymbolModal(null)}>
+          <section className="dialog-panel add-symbol-dialog" onClick={(event) => event.stopPropagation()}>
+            <div className="dialog-header">
+              <h2>Add Symbol</h2>
+              <button className="btn-close import-close" aria-label="Close dialog" onClick={() => setAddSymbolModal(null)}>✕</button>
+            </div>
+            <div className="add-symbol-body">
+              <label>
+                Symbol
+                <input
+                  value={newSymbol}
+                  onChange={(event) => setNewSymbol(event.target.value)}
+                  placeholder="NVDA"
+                />
+              </label>
+            </div>
+            <div className="import-footer">
+              <button className="btn-secondary" onClick={() => setAddSymbolModal(null)}>Cancel</button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  if (!newSymbol.trim()) return;
+                  onAddSymbol(addSymbolModal.watchlistId, newSymbol.trim());
+                  setAddSymbolModal(null);
+                  setNewSymbol("");
+                }}
+              >
+                Add
+              </button>
+            </div>
+          </section>
         </div>
       ) : null}
     </section>

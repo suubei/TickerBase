@@ -8,7 +8,7 @@ type UseImportModuleOptions = {
 };
 
 export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModuleOptions) {
-  const [jsonPayload, setJsonPayload] = useState("{\n\n}");
+  const [jsonPayload, setJsonPayload] = useState("");
   const [markdownReport, setMarkdownReport] = useState("# Report\n");
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModul
           onMessage(`${result.updated ? "Updated" : "Imported"} ${result.ticker}, v${result.version}`);
         }
       }
-      setJsonPayload("{\n  \"ticker\": \"\",\n  \"company_name\": \"\"\n}");
+      setJsonPayload("");
       closeImport();
       await reloadAfterSubmit();
     } catch (err) {
@@ -108,7 +108,7 @@ export function useImportModule({ onMessage, reloadAfterSubmit }: UseImportModul
 
   const openNewImport = useCallback(() => {
     setEditingTicker(null);
-    setJsonPayload("{\n  \"ticker\": \"\",\n  \"company_name\": \"\"\n}");
+    setJsonPayload("");
     setMarkdownReport("# Report\n");
     setIsImportOpen(true);
   }, []);

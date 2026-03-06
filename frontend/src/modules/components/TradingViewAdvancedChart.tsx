@@ -44,8 +44,6 @@ export function TradingViewAdvancedChart({ symbol }: TradingViewAdvancedChartPro
   }, [symbol]);
 
   return (
-    <div className="tv-widget-wrap">
-      <div id="tv-advanced-chart-container" className="tv-widget-host" />
-    </div>
+    <div id="tv-advanced-chart-container" className="tv-widget-host" />
   );
 }

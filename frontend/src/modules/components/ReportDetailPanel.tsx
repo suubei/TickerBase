@@ -49,13 +49,13 @@ export function ReportDetailPanel({
           <h4>历史版本</h4>
           <div className="report-list">
             {reports.map((report) => (
-              <button className={`btn-ghost ${activeReport?.id === report.id ? "active" : ""}`} key={report.id} onClick={() => onSelectReport(report.id)}>
+              <button className={`report-version-btn ${activeReport?.id === report.id ? "active" : ""}`} key={report.id} onClick={() => onSelectReport(report.id)}>
                 v{report.version} - {new Date(report.generatedAt).toLocaleString()}
               </button>
             ))}
           </div>
 
-          <div className="actions">
+          <div className="actions report-actions">
             {!isEditingReport ? (
               <button className="btn-secondary" onClick={onStartEditReport} disabled={!activeReport || isSavingReport}>编辑当前版本</button>
             ) : (

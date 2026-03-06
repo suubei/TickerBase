@@ -121,7 +121,7 @@ export function StockModule(props: StockModuleProps) {
       {toast ? <div className="module2-toast">{toast}</div> : null}
       <div className="module2-topbar">
         <div>
-          <h2>模块2: stock module</h2>
+          <h2>Stock</h2>
           <p>{stocks.length} total stocks</p>
         </div>
         <div className="actions">
@@ -245,13 +245,14 @@ export function StockModule(props: StockModuleProps) {
                   })}
                   <td>
                     <button
-                      className="btn-ghost"
+                      className="icon-edit"
+                      aria-label={`Edit ${stock.ticker}`}
                       onClick={(event) => {
                         event.stopPropagation();
                         onEditStock(stock);
                       }}
                     >
-                      编辑
+                      ✎
                     </button>
                   </td>
                 </tr>
