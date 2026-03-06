@@ -10,30 +10,43 @@ type SideMenuProps = {
 export function SideMenu({ isCollapsed, activeModule, onToggleCollapse, onSelectModule }: SideMenuProps) {
   return (
     <aside className={`side-menu ${isCollapsed ? "collapsed" : ""}`}>
-      <button className="menu-toggle" onClick={onToggleCollapse}>
-        {isCollapsed ? "»" : "«"}
-      </button>
-      <button
-        className={`menu-item ${activeModule === "stockModule" ? "active" : ""}`}
-        onClick={() => onSelectModule("stockModule")}
-        title="Stock"
-      >
-        <span>Stock</span>
-      </button>
-      <button
-        className={`menu-item ${activeModule === "watchlistModule" ? "active" : ""}`}
-        onClick={() => onSelectModule("watchlistModule")}
-        title="Watchlist"
-      >
-        <span>Watchlist</span>
-      </button>
-      <button
-        className={`menu-item ${activeModule === "settingModule" ? "active" : ""}`}
-        onClick={() => onSelectModule("settingModule")}
-        title="Setting"
-      >
-        <span>Setting</span>
-      </button>
+      <div className="side-menu-brand">
+        <span className="side-menu-brand-icon">📈</span>
+        <span className="side-menu-brand-text">TickerBase</span>
+      </div>
+
+      <nav className="side-menu-nav">
+        <button
+          className={`menu-item ${activeModule === "stockModule" ? "active" : ""}`}
+          onClick={() => onSelectModule("stockModule")}
+          title="Stock"
+        >
+          <span className="menu-icon">≡</span>
+          <span className="menu-label">Stock</span>
+        </button>
+        <button
+          className={`menu-item ${activeModule === "watchlistModule" ? "active" : ""}`}
+          onClick={() => onSelectModule("watchlistModule")}
+          title="Watchlist"
+        >
+          <span className="menu-icon">★</span>
+          <span className="menu-label">Watchlist</span>
+        </button>
+        <button
+          className={`menu-item ${activeModule === "settingModule" ? "active" : ""}`}
+          onClick={() => onSelectModule("settingModule")}
+          title="Settings"
+        >
+          <span className="menu-icon">⚙</span>
+          <span className="menu-label">Settings</span>
+        </button>
+      </nav>
+
+      <div className="side-menu-footer">
+        <button className="menu-toggle" onClick={onToggleCollapse} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+          {isCollapsed ? "»" : "«"}
+        </button>
+      </div>
     </aside>
   );
 }

@@ -50,7 +50,7 @@ export function WatchlistModule({
   }
 
   return (
-    <section className="panel">
+    <section className="panel module-watchlist">
       <div className="watchlist-layout">
         <div className="watchlist-box watchlist-chart-box">
           {renderChart(activeChartTicker)}

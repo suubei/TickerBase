@@ -272,6 +272,7 @@ function App() {
       {activeModule === "stockModule" ? (
         <StockModule
           toast={toast}
+          pageSize={MODULE2_PAGE_SIZE}
           stocks={stocks}
           totalStocks={totalStocks}
           isSelectMode={isSelectMode}

@@ -11,6 +11,7 @@ type StockRow = {
 
 type StockModuleProps = {
   toast: string;
+  pageSize: number;
   stocks: Stock[];
   totalStocks: number;
   isSelectMode: boolean;
@@ -65,6 +66,7 @@ type StockModuleProps = {
 export function StockModule(props: StockModuleProps) {
   const {
     toast,
+    pageSize,
     stocks,
     totalStocks,
     isSelectMode,
@@ -168,7 +170,7 @@ export function StockModule(props: StockModuleProps) {
 
       {error && <div className="error">{error}</div>}
       {loading ? (
-        <div className="muted-text">Loading...</div>
+        <div className="module2-loading">Loading...</div>
       ) : (
         <div className="table-wrap">
           <table>
@@ -262,8 +264,7 @@ export function StockModule(props: StockModuleProps) {
 
           <div className="table-footer">
             <span>
-              Showing {(totalStocks === 0 ? 0 : ((currentPage - 1) * 2) + 1)}-
-              {Math.min(currentPage * 2, totalStocks)} of {totalStocks} stocks
+              Showing {totalStocks === 0 ? 0 : (currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalStocks)} of {totalStocks} stocks
             </span>
             <div className="table-pagination">
               <button className="pagination-btn" disabled={currentPage <= 1} onClick={onGoToFirstPage}>«</button>
