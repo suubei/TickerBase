@@ -148,6 +148,20 @@ export async function deleteWatchlist(watchlistId: number) {
   });
 }
 
+export async function reorderWatchlists(ids: number[]) {
+  return request<void>("/watchlists/reorder", {
+    method: "PATCH",
+    body: JSON.stringify({ ids })
+  });
+}
+
+export async function reorderWatchlistStocks(watchlistId: number, tickers: string[]) {
+  return request<void>(`/watchlists/${watchlistId}/stocks/reorder`, {
+    method: "PATCH",
+    body: JSON.stringify({ tickers })
+  });
+}
+
 export async function getSettings() {
   return request<SettingsPayload>("/settings");
 }

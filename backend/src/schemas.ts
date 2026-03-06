@@ -46,6 +46,14 @@ export const tableFieldsUpdateSchema = z.object({
   fields: z.array(tableFieldSchema)
 });
 
+export const watchlistReorderSchema = z.object({
+  ids: z.array(z.number().int().positive())
+});
+
+export const watchlistStocksReorderSchema = z.object({
+  tickers: z.array(z.string().min(1))
+});
+
 export const reportCreateSchema = z.object({
   content: z.string().min(1)
 });

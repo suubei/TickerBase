@@ -1,38 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { addTickerToWatchlist, deleteWatchlist, getWatchlists, removeTickerFromWatchlist } from "../../api";
+import { addTickerToWatchlist, deleteWatchlist, getWatchlists, removeTickerFromWatchlist, reorderWatchlists as reorderWatchlistsApi, reorderWatchlistStocks as reorderWatchlistStocksApi } from "../../api";
 import type { Watchlist } from "../../types";
 
 export function useWatchlistModule(onMessage: (message: string) => void) {
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [expandedWatchlistId, setExpandedWatchlistId] = useState<number | null>(null);
   const [activeChartTicker, setActiveChartTicker] = useState<string>("");
-  const [watchlistOrder, setWatchlistOrder] = useState<number[]>([]);
-  const [stockOrderMap, setStockOrderMap] = useState<Record<number, string[]>>({});
 
-  const orderedWatchlists = useMemo(() => {
-    if (watchlistOrder.length === 0) return watchlists;
-    const byId = new Map(watchlists.map((item) => [item.id, item]));
-    const ordered = watchlistOrder
-      .map((id) => byId.get(id))
-      .filter((item): item is Watchlist => Boolean(item));
-    const leftovers = watchlists.filter((item) => !watchlistOrder.includes(item.id));
-    return [...ordered, ...leftovers];
-  }, [watchlistOrder, watchlists]);
-
-  const watchlistsWithStockOrder = useMemo(() => {
-    return orderedWatchlists.map((item) => {
-      const order = stockOrderMap[item.id];
-      if (!order || order.length === 0) return item;
-      const orderedTickers = order.filter((ticker) => item.tickers.includes(ticker));
-      const leftovers = item.tickers.filter((ticker) => !order.includes(ticker));
-      return { ...item, tickers: [...orderedTickers, ...leftovers] };
-    });
-  }, [orderedWatchlists, stockOrderMap]);
-
-  const watchlistNames = useMemo(() => watchlistsWithStockOrder.map((item) => item.name), [watchlistsWithStockOrder]);
+  const watchlistNames = useMemo(() => watchlists.map((item) => item.name), [watchlists]);
   const activeWatchlist = useMemo(
-    () => watchlistsWithStockOrder.find((item) => item.id === expandedWatchlistId) ?? watchlistsWithStockOrder[0] ?? null,
-    [watchlistsWithStockOrder, expandedWatchlistId]
+    () => watchlists.find((item) => item.id === expandedWatchlistId) ?? watchlists[0] ?? null,
+    [watchlists, expandedWatchlistId]
   );
 
   const loadWatchlists = useCallback(async () => {
@@ -45,56 +23,21 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
   }, []);
 
   useEffect(() => {
-    if (watchlistsWithStockOrder.length === 0) {
+    if (watchlists.length === 0) {
       setActiveChartTicker("");
       return;
     }
-    const allTickers = watchlistsWithStockOrder.flatMap((item) => item.tickers);
+    const allTickers = watchlists.flatMap((item) => item.tickers);
     if (!allTickers.includes(activeChartTicker)) {
       setActiveChartTicker(allTickers[0] ?? "");
     }
-  }, [watchlistsWithStockOrder, activeChartTicker]);
-
-  useEffect(() => {
-    const rawWatchlistOrder = window.localStorage.getItem("watchlist.order");
-    const rawStockOrder = window.localStorage.getItem("watchlist.stockOrder");
-    if (rawWatchlistOrder) {
-      try {
-        setWatchlistOrder(JSON.parse(rawWatchlistOrder) as number[]);
-      } catch {
-        setWatchlistOrder([]);
-      }
-    }
-    if (rawStockOrder) {
-      try {
-        const parsed = JSON.parse(rawStockOrder) as Record<string, string[]>;
-        const converted: Record<number, string[]> = {};
-        for (const [key, value] of Object.entries(parsed)) {
-          const numericKey = Number(key);
-          if (Number.isInteger(numericKey)) converted[numericKey] = value;
-        }
-        setStockOrderMap(converted);
-      } catch {
-        setStockOrderMap({});
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem("watchlist.order", JSON.stringify(watchlistOrder));
-  }, [watchlistOrder]);
-
-  useEffect(() => {
-    window.localStorage.setItem("watchlist.stockOrder", JSON.stringify(stockOrderMap));
-  }, [stockOrderMap]);
+  }, [watchlists, activeChartTicker]);
 
   const removeFromWatchlist = useCallback(async (watchlistId: number, tickerToRemove: string) => {
     try {
       await removeTickerFromWatchlist(watchlistId, tickerToRemove);
       await loadWatchlists();
-      if (activeChartTicker === tickerToRemove) {
-        setActiveChartTicker("");
-      }
+      if (activeChartTicker === tickerToRemove) setActiveChartTicker("");
       onMessage(`Removed ${tickerToRemove} from watchlist`);
     } catch (err) {
       onMessage(err instanceof Error ? err.message : "Failed to remove ticker");
@@ -131,7 +74,7 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
   }, [activeWatchlist]);
 
   const exportWatchlistCsv = useCallback((watchlistId: number) => {
-    const target = watchlistsWithStockOrder.find((item) => item.id === watchlistId);
+    const target = watchlists.find((item) => item.id === watchlistId);
     if (!target) return;
     const rows = target.tickers.join("\n");
     const blob = new Blob([rows], { type: "text/plain;charset=utf-8" });
@@ -141,7 +84,7 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
     anchor.download = `watchlist_${new Date().toISOString().slice(0, 10)}.txt`;
     anchor.click();
     URL.revokeObjectURL(url);
-  }, [watchlistsWithStockOrder]);
+  }, [watchlists]);
 
   const addSymbol = useCallback(async (watchlistId: number, ticker: string) => {
     const normalized = ticker.trim().toUpperCase();
@@ -151,32 +94,35 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
       await loadWatchlists();
       setExpandedWatchlistId(watchlistId);
       setActiveChartTicker(normalized);
-      setStockOrderMap((prev) => {
-        const next = { ...prev };
-        next[watchlistId] = [...(next[watchlistId] ?? []), normalized];
-        return next;
-      });
       onMessage(`Added ${normalized}`);
     } catch (err) {
       onMessage(err instanceof Error ? err.message : "Failed to add symbol");
     }
   }, [loadWatchlists, onMessage]);
 
-  const reorderWatchlists = useCallback((fromId: number, toId: number) => {
-    setWatchlistOrder((prev) => {
-      const base = prev.length ? prev.filter((id) => watchlists.some((w) => w.id === id)) : watchlists.map((w) => w.id);
-      const fromIndex = base.indexOf(fromId);
-      const toIndex = base.indexOf(toId);
-      if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return base;
-      const next = [...base];
-      const [moved] = next.splice(fromIndex, 1);
-      next.splice(toIndex, 0, moved);
-      return next;
+  const reorderWatchlists = useCallback(async (fromId: number, toId: number) => {
+    const base = watchlists.map((w) => w.id);
+    const fromIndex = base.indexOf(fromId);
+    const toIndex = base.indexOf(toId);
+    if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
+    const newOrder = [...base];
+    const [moved] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, moved);
+    // Optimistic update
+    setWatchlists((prev) => {
+      const byId = new Map(prev.map((w) => [w.id, w]));
+      return newOrder.map((id) => byId.get(id)!).filter(Boolean);
     });
-  }, [watchlists]);
+    try {
+      await reorderWatchlistsApi(newOrder);
+    } catch {
+      onMessage("Failed to save watchlist order");
+      await loadWatchlists();
+    }
+  }, [watchlists, loadWatchlists, onMessage]);
 
-  const reorderStockWithinWatchlist = useCallback((watchlistId: number, fromTicker: string, toTicker: string) => {
-    const watchlist = watchlistsWithStockOrder.find((item) => item.id === watchlistId);
+  const reorderStockWithinWatchlist = useCallback(async (watchlistId: number, fromTicker: string, toTicker: string) => {
+    const watchlist = watchlists.find((item) => item.id === watchlistId);
     if (!watchlist) return;
     const base = [...watchlist.tickers];
     const fromIndex = base.indexOf(fromTicker);
@@ -184,8 +130,17 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
     if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
     const [moved] = base.splice(fromIndex, 1);
     base.splice(toIndex, 0, moved);
-    setStockOrderMap((prev) => ({ ...prev, [watchlistId]: base }));
-  }, [watchlistsWithStockOrder]);
+    // Optimistic update
+    setWatchlists((prev) =>
+      prev.map((w) => w.id === watchlistId ? { ...w, tickers: base } : w)
+    );
+    try {
+      await reorderWatchlistStocksApi(watchlistId, base);
+    } catch {
+      onMessage("Failed to save stock order");
+      await loadWatchlists();
+    }
+  }, [watchlists, loadWatchlists, onMessage]);
 
   const moveStockBetweenWatchlists = useCallback(async (fromWatchlistId: number, toWatchlistId: number, ticker: string, toTicker: string) => {
     if (fromWatchlistId === toWatchlistId) return;
@@ -196,40 +151,36 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
     try {
       await addTickerToWatchlist(toWatchlistId, normalizedTicker);
       await removeTickerFromWatchlist(fromWatchlistId, normalizedTicker);
-      await loadWatchlists();
+      const updated = await getWatchlists();
+      setWatchlists(updated);
+
+      // Persist new ticker order in target watchlist
+      const targetList = updated.find((w) => w.id === toWatchlistId);
+      if (targetList) {
+        const withoutMoved = targetList.tickers.filter((t) => t !== normalizedTicker);
+        const insertIndex = withoutMoved.indexOf(normalizedToTicker);
+        const newOrder = [...withoutMoved];
+        if (insertIndex >= 0) {
+          newOrder.splice(insertIndex, 0, normalizedTicker);
+        } else {
+          newOrder.push(normalizedTicker);
+        }
+        await reorderWatchlistStocksApi(toWatchlistId, newOrder);
+        setWatchlists((prev) =>
+          prev.map((w) => w.id === toWatchlistId ? { ...w, tickers: newOrder } : w)
+        );
+      }
 
       setExpandedWatchlistId(toWatchlistId);
       setActiveChartTicker(normalizedTicker);
-      setStockOrderMap((prev) => {
-        const next: Record<number, string[]> = { ...prev };
-
-        const sourceCurrent = next[fromWatchlistId]
-          ?? watchlistsWithStockOrder.find((item) => item.id === fromWatchlistId)?.tickers
-          ?? [];
-        next[fromWatchlistId] = sourceCurrent.filter((item) => item !== normalizedTicker);
-
-        const targetCurrent = next[toWatchlistId]
-          ?? watchlistsWithStockOrder.find((item) => item.id === toWatchlistId)?.tickers
-          ?? [];
-        const targetWithoutMoved = targetCurrent.filter((item) => item !== normalizedTicker);
-        const insertIndex = targetWithoutMoved.indexOf(normalizedToTicker);
-        if (insertIndex >= 0) {
-          targetWithoutMoved.splice(insertIndex, 0, normalizedTicker);
-        } else {
-          targetWithoutMoved.push(normalizedTicker);
-        }
-        next[toWatchlistId] = targetWithoutMoved;
-        return next;
-      });
-
       onMessage(`Moved ${normalizedTicker}`);
     } catch (err) {
       onMessage(err instanceof Error ? err.message : "Failed to move ticker");
     }
-  }, [loadWatchlists, onMessage, watchlistsWithStockOrder]);
+  }, [loadWatchlists, onMessage, watchlists]);
 
   return {
-    watchlists: watchlistsWithStockOrder,
+    watchlists,
     watchlistNames,
     expandedWatchlistId,
     setExpandedWatchlistId,
