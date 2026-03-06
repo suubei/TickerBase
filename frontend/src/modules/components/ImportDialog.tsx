@@ -37,7 +37,12 @@ export function ImportDialog({
     <div className="dialog-backdrop" onClick={onClose}>
       <section className={`dialog-panel import-dialog ${isEditing ? "edit-mode" : "create-mode"}`} onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h2>{isEditing ? "Edit" : "Create"}</h2>
+          <div>
+            <h2>{isEditing ? "Edit Stock" : "Create Stock"}</h2>
+            <p className="import-dialog-subtitle">
+              {isEditing ? "Update existing record fields" : "Paste JSON data and optionally a Markdown report"}
+            </p>
+          </div>
           <button className="btn-close import-close" aria-label="Close dialog" onClick={onClose}>✕</button>
         </div>
 

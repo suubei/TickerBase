@@ -123,8 +123,8 @@ export function StockModule(props: StockModuleProps) {
       {toast ? <div className="module2-toast">{toast}</div> : null}
       <div className="module2-topbar">
         <div>
-          <h2>Stock</h2>
-          <p>{stocks.length} total stocks</p>
+          <h2>Stocks</h2>
+          <p>{totalStocks} total stocks</p>
         </div>
         <div className="actions">
           <button className={`btn-secondary ${isSelectMode ? "active" : ""}`} onClick={onToggleSelectMode}>
@@ -146,7 +146,11 @@ export function StockModule(props: StockModuleProps) {
       ) : null}
 
       <div className="toolbar toolbar-main module2-filters">
-        <input value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search" />
+        <div className="module2-search-wrap">
+          <span className="module2-search-icon">⌕</span>
+          <input value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search stocks…" />
+          {search && <button className="module2-search-clear" onClick={() => onSearchChange("")}>✕</button>}
+        </div>
         <select value={categoryFilter} onChange={(e) => onCategoryFilterChange(e.target.value)}>
           <option value="">All categories</option>
           {categories.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -240,7 +244,17 @@ export function StockModule(props: StockModuleProps) {
                     }
 
                     if (column.key === "ticker") {
-                      return <td key={column.key} className="ticker-cell">{formatCellValue(column.key, value)}</td>;
+                      return (
+                        <td key={column.key} className="ticker-cell">
+                          <div className="ticker-cell-wrap">
+                            <div>
+                              <div className="ticker-cell-label">{formatCellValue(column.key, value)}</div>
+                              {stock.companyName && <div className="ticker-cell-name">{stock.companyName}</div>}
+                            </div>
+                            {stock.isArchived && <span className="ticker-archived-badge">Archived</span>}
+                          </div>
+                        </td>
+                      );
                     }
 
                     return <td key={column.key}>{formatCellValue(column.key, value)}</td>;
