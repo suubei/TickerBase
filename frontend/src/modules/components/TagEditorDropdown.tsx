@@ -32,40 +32,64 @@ export function TagEditorDropdown({
 }: TagEditorDropdownProps) {
   if (!tagDropdown) return null;
 
+  const isTheme = tagDropdown.kind === "theme";
+  const filtered = tagNames.filter((name) =>
+    name.toLowerCase().includes(tagSearch.toLowerCase())
+  );
+
   return (
     <div className="tag-dropdown-backdrop" onClick={onClose}>
-      <section
-        className="tag-dropdown-panel"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h4>{tagDropdown.kind === "theme" ? "编辑 Themes" : "编辑 Categories"}</h4>
-        <input
-          placeholder={tagDropdown.kind === "theme" ? "搜索 Theme..." : "搜索 Category..."}
-          value={tagSearch}
-          onChange={(e) => onTagSearchChange(e.target.value)}
-        />
+      <section className="tag-dropdown-panel" onClick={(e) => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="tag-dropdown-head">
+          <h4 className="tag-dropdown-title">
+            {isTheme ? "Edit Themes" : "Edit Categories"}
+          </h4>
+          <button className="tag-dropdown-close" onClick={onClose}>✕</button>
+        </div>
+
+        {/* Search */}
+        <div className="tag-dropdown-search-wrap">
+          <input
+            className="tag-dropdown-search"
+            placeholder={isTheme ? "Search themes…" : "Search categories…"}
+            value={tagSearch}
+            onChange={(e) => onTagSearchChange(e.target.value)}
+          />
+        </div>
+
+        {/* Tag list */}
         <div className="tag-dropdown-list">
-          {tagNames
-            .filter((name) => name.toLowerCase().includes(tagSearch.toLowerCase()))
-            .map((name) => (
-              <label key={`dropdown-${tagDropdown.kind}-${name}`} className="inline">
+          {filtered.length === 0 && (
+            <div className="tag-dropdown-empty">No results</div>
+          )}
+          {filtered.map((name) => {
+            const checked = tagDropdown.selectedValues.includes(name);
+            return (
+              <label key={`dropdown-${tagDropdown.kind}-${name}`} className={`tag-dropdown-item ${checked ? "checked" : ""}`}>
                 <input
                   type="checkbox"
-                  checked={tagDropdown.selectedValues.includes(name)}
+                  checked={checked}
                   onChange={() => onToggleTag(name)}
                 />
-                {name}
+                <span>{name}</span>
               </label>
-            ))}
+            );
+          })}
         </div>
-        <div className="settings-inline">
+
+        {/* Create new */}
+        <div className="tag-dropdown-footer">
           <input
-            placeholder={tagDropdown.kind === "theme" ? "新建 Theme" : "新建 Category"}
+            className="tag-dropdown-new-input"
+            placeholder={isTheme ? "New theme name…" : "New category name…"}
             value={newTagName}
             onChange={(e) => onNewTagNameChange(e.target.value)}
           />
-          <button className="btn-secondary" onClick={onCreateTag}>新建并选中</button>
+          <button className="btn-primary tag-dropdown-create-btn" onClick={onCreateTag}>+ Add</button>
         </div>
+
       </section>
     </div>
   );
