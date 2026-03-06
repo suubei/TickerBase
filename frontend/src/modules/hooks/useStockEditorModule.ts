@@ -85,15 +85,29 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
   const openEditStock = useCallback(async (stock: Stock) => {
     onMessage("");
     setEditingTicker(stock.ticker);
+
+    // Build JSON from current DB fields, merging rawJson extras so no data is lost
+    let base: Record<string, unknown> = {};
     if (stock.rawJson?.trim()) {
       try {
-        setJsonPayload(JSON.stringify(JSON.parse(stock.rawJson), null, 2));
+        base = JSON.parse(stock.rawJson) as Record<string, unknown>;
       } catch {
-        setJsonPayload(stock.rawJson);
+        // ignore malformed rawJson
       }
-    } else {
-      setJsonPayload("{\n\n}");
     }
+    const merged: Record<string, unknown> = {
+      ...base,
+      ticker: stock.ticker,
+      ...(stock.companyName != null && { companyName: stock.companyName }),
+      ...(stock.summary != null && { summary: stock.summary }),
+      ...(stock.risk != null && { risk: stock.risk }),
+      ...(stock.catalyst != null && { catalyst: stock.catalyst }),
+      ...(stock.themeBenefit != null && { themeBenefit: stock.themeBenefit }),
+      ...(stock.themePhase != null && { themePhase: stock.themePhase }),
+      ...(stock.themes.length > 0 && { themes: stock.themes }),
+      ...(stock.categories.length > 0 && { categories: stock.categories }),
+    };
+    setJsonPayload(JSON.stringify(merged, null, 2));
     setMarkdownReport("# Report\n");
     setIsEditorOpen(true);
 
