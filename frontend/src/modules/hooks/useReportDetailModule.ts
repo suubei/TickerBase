@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { createReportVersion, getReportContent, getReports, updateReportContent } from "../../api";
+import { createReportVersion, deleteReport, getReportContent, getReports, updateReportContent } from "../../api";
 import type { ReportMeta, Stock } from "../../types";
 
 type ActiveReport = { id: number; content: string; version: number } | null;
@@ -111,6 +111,32 @@ export function useReportDetailModule({ onMessage }: UseReportDetailModuleOption
     }
   }, [activeReport?.content, loadReportsForTicker, onMessage, reportDraft, selected]);
 
+  const deleteReportVersion = useCallback(async (reportId: number) => {
+    if (!selected) return;
+    setIsSavingReport(true);
+    try {
+      await deleteReport(reportId);
+      const remaining = await getReports(selected.ticker);
+      setReports(remaining);
+      if (activeReport?.id === reportId) {
+        if (remaining.length > 0) {
+          const content = await getReportContent(remaining[0].id);
+          setActiveReport({ id: remaining[0].id, content: content.content, version: content.version });
+          setReportDraft(content.content);
+        } else {
+          setActiveReport(null);
+          setReportDraft("");
+        }
+        setIsEditingReport(false);
+      }
+      onMessage("Report version deleted");
+    } catch (err) {
+      onMessage(err instanceof Error ? err.message : "Failed to delete report");
+    } finally {
+      setIsSavingReport(false);
+    }
+  }, [activeReport, onMessage, selected]);
+
   return {
     selected,
     setSelected,
@@ -124,6 +150,7 @@ export function useReportDetailModule({ onMessage }: UseReportDetailModuleOption
     startEditReport,
     cancelEditReport,
     saveEditedReport,
-    createNewReportVersionFromDraft
+    createNewReportVersionFromDraft,
+    deleteReportVersion
   };
 }

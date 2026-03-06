@@ -105,6 +105,12 @@ export async function createReportVersion(ticker: string, content: string) {
   });
 }
 
+export async function deleteReport(reportId: number) {
+  return request<void>(`/reports/${reportId}`, {
+    method: "DELETE"
+  });
+}
+
 export async function updateReportContent(reportId: number, content: string) {
   return request<{ id: number; content: string; generatedAt: string; version: number }>(`/reports/${reportId}/content`, {
     method: "PUT",

@@ -171,7 +171,8 @@ function App() {
     startEditReport,
     cancelEditReport,
     saveEditedReport,
-    createNewReportVersionFromDraft
+    createNewReportVersionFromDraft,
+    deleteReportVersion
   } = useReportDetailModule({ onMessage: setMessage });
 
   const {
@@ -417,6 +418,7 @@ function App() {
         onReportDraftChange={setReportDraft}
         onSaveEditedReport={() => void saveEditedReport()}
         onCreateNewReportVersion={() => void createNewReportVersionFromDraft()}
+        onDeleteReport={(id) => void deleteReportVersion(id)}
       />
       </div>
     </div>

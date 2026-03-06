@@ -362,6 +362,22 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
     res.status(201).json(created);
   }));
 
+  router.delete("/reports/:id", withAsync(async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ error: "Invalid report id" });
+    }
+
+    const report = await prisma.report.findUnique({ where: { id } });
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    await prisma.report.delete({ where: { id } });
+    await fs.unlink(report.filePath).catch(() => {});
+    res.status(204).end();
+  }));
+
   router.put("/reports/:id/content", withAsync(async (req, res) => {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {

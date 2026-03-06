@@ -20,6 +20,7 @@ type ReportDetailPanelProps = {
   onReportDraftChange: (value: string) => void;
   onSaveEditedReport: () => void;
   onCreateNewReportVersion: () => void;
+  onDeleteReport: (reportId: number) => void;
 };
 
 export function ReportDetailPanel({
@@ -35,7 +36,8 @@ export function ReportDetailPanel({
   onCancelEditReport,
   onReportDraftChange,
   onSaveEditedReport,
-  onCreateNewReportVersion
+  onCreateNewReportVersion,
+  onDeleteReport
 }: ReportDetailPanelProps) {
   const [showPreview, setShowPreview] = useState(true);
 
@@ -67,7 +69,7 @@ export function ReportDetailPanel({
                 const isActive = activeReport?.id === report.id;
                 const isLatest = report.id === latestReportId;
                 return (
-                  <button
+                  <div
                     key={report.id}
                     className={`detail-vbtn ${isActive ? "active" : ""}`}
                     onClick={() => onSelectReport(report.id)}
@@ -77,11 +79,23 @@ export function ReportDetailPanel({
                       {isLatest && (
                         <span className="detail-badge detail-badge-latest">Latest</span>
                       )}
+                      <button
+                        className="detail-vbtn-delete"
+                        aria-label={`Delete version ${report.version}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Delete Version ${report.version}? This cannot be undone.`)) {
+                            onDeleteReport(report.id);
+                          }
+                        }}
+                      >
+                        ✕
+                      </button>
                     </div>
                     <p className="detail-vbtn-date">
                       {new Date(report.generatedAt).toLocaleString()}
                     </p>
-                  </button>
+                  </div>
                 );
               })}
               {sortedReports.length === 0 && (
