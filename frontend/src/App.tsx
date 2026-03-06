@@ -2,7 +2,7 @@ import { useState } from "react";
 import { SettingsModule } from "./modules/SettingsModule";
 import { StockModule } from "./modules/StockModule";
 import { WatchlistModule } from "./modules/WatchlistModule";
-import { ImportDialog } from "./modules/components/ImportDialog";
+import { StockEditorDialog } from "./modules/components/StockEditorDialog";
 import { ReportDetailPanel } from "./modules/components/ReportDetailPanel";
 import { SideMenu } from "./modules/components/SideMenu";
 import { TagEditorDropdown } from "./modules/components/TagEditorDropdown";
@@ -13,7 +13,7 @@ import type { ActiveModule } from "./modules/types";
 import { useSettingsModule } from "./modules/hooks/useSettingsModule";
 import { useAppViewActions } from "./modules/hooks/useAppViewActions";
 import { useAppBootstrap } from "./modules/hooks/useAppBootstrap";
-import { useImportModule } from "./modules/hooks/useImportModule";
+import { useStockEditorModule } from "./modules/hooks/useStockEditorModule";
 import { useReportDetailModule } from "./modules/hooks/useReportDetailModule";
 import { useSettingsActions } from "./modules/hooks/useSettingsActions";
 import { useStockTableModule } from "./modules/hooks/useStockTableModule";
@@ -21,7 +21,7 @@ import { useTagEditorModule } from "./modules/hooks/useTagEditorModule";
 import { useWatchlistCreateModule } from "./modules/hooks/useWatchlistCreateModule";
 import { useWatchlistModule } from "./modules/hooks/useWatchlistModule";
 
-const MODULE2_PAGE_SIZE = 20;
+const STOCK_PAGE_SIZE = 20;
 
 function App() {
   const [message, setMessage] = useState("");
@@ -64,7 +64,7 @@ function App() {
     exportSelectedTickers,
     archiveSelectedStocks,
     unarchiveSelectedStocks
-  } = useStockTableModule({ pageSize: MODULE2_PAGE_SIZE, onMessage: setMessage });
+  } = useStockTableModule({ pageSize: STOCK_PAGE_SIZE, onMessage: setMessage });
 
   const {
     settings,
@@ -119,8 +119,8 @@ function App() {
     loadWatchlists,
     removeFromWatchlist,
     removeWatchlist,
-    exportWatchlistCsv,
-    addSymbol,
+    exportWatchlist,
+    addTicker,
     reorderWatchlists,
     reorderStockWithinWatchlist,
     moveStockBetweenWatchlists
@@ -180,13 +180,13 @@ function App() {
     setJsonPayload,
     markdownReport,
     setMarkdownReport,
-    isImportOpen,
+    isEditorOpen,
     isEditing,
-    closeImport,
-    submitImport,
-    openEditImport,
-    openNewImport
-  } = useImportModule({
+    closeEditor,
+    submitEditor,
+    openEditStock,
+    openCreateStock
+  } = useStockEditorModule({
     onMessage: setMessage,
     reloadAfterSubmit: async () => {
       await loadStocks();
@@ -228,14 +228,14 @@ function App() {
     onToggleTag,
     onCreateTag,
     onSelectReport,
-    onSubmitImport,
+    onSubmitEditor,
     onCloseReport
   } = useAppViewActions({
     isSelectMode,
     totalPages,
     toggleRowSelected,
     setSelected,
-    openEditImport,
+    openEditStock,
     setCurrentPage,
     archiveSelectedStocks,
     unarchiveSelectedStocks,
@@ -249,7 +249,7 @@ function App() {
     toggleTagFromDropdown,
     createTagFromDropdown,
     selectReport,
-    submitImport
+    submitEditor
   });
 
   const { visibleColumns } = useAppBootstrap({
@@ -273,7 +273,7 @@ function App() {
       {activeModule === "stockModule" ? (
         <StockModule
           toast={toast}
-          pageSize={MODULE2_PAGE_SIZE}
+          pageSize={STOCK_PAGE_SIZE}
           stocks={stocks}
           totalStocks={totalStocks}
           isSelectMode={isSelectMode}
@@ -299,7 +299,7 @@ function App() {
           totalPages={totalPages}
           paginationItems={paginationItems}
           onToggleSelectMode={toggleSelectMode}
-          onOpenNewImport={openNewImport}
+          onOpenCreateStock={openCreateStock}
           onExportSelectedTickers={exportSelectedTickers}
           onOpenWatchlistModal={openWatchlistModal}
           onArchiveSelectedStocks={onArchiveSelectedStocks}
@@ -347,16 +347,16 @@ function App() {
           onDeleteWatchlist={onDeleteWatchlist}
           onSelectTicker={setActiveChartTicker}
           onRemoveTicker={onRemoveTicker}
-          onExportWatchlistCsv={exportWatchlistCsv}
-          onAddSymbol={addSymbol}
+          onExportWatchlist={exportWatchlist}
+          onAddTicker={addTicker}
           onReorderWatchlists={reorderWatchlists}
           onReorderStocks={reorderStockWithinWatchlist}
           onMoveStock={moveStockBetweenWatchlists}
-          renderChart={(symbol) => <TradingViewAdvancedChart symbol={symbol} />}
+          renderChart={(ticker) => <TradingViewAdvancedChart symbol={ticker} />}
         />
       ) : null}
 
-      {activeModule === "settingModule" ? (
+      {activeModule === "settingsModule" ? (
         <SettingsModule
           themeEdits={themeEdits}
           categoryEdits={categoryEdits}
@@ -381,15 +381,15 @@ function App() {
         />
       ) : null}
 
-      <ImportDialog
-        isOpen={isImportOpen}
+      <StockEditorDialog
+        isOpen={isEditorOpen}
         isEditing={isEditing}
         jsonPayload={jsonPayload}
         markdownReport={markdownReport}
         onJsonPayloadChange={setJsonPayload}
         onMarkdownReportChange={setMarkdownReport}
-        onClose={closeImport}
-        onSubmit={onSubmitImport}
+        onClose={closeEditor}
+        onSubmit={onSubmitEditor}
       />
 
       <TagEditorDropdown

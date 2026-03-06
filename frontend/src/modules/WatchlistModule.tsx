@@ -22,12 +22,12 @@ type WatchlistModuleProps = {
   onDeleteWatchlist: (id: number) => void;
   onSelectTicker: (ticker: string) => void;
   onRemoveTicker: (watchlistId: number, ticker: string) => void;
-  onExportWatchlistCsv: (watchlistId: number) => void;
-  onAddSymbol: (watchlistId: number, ticker: string) => void;
+  onExportWatchlist: (watchlistId: number) => void;
+  onAddTicker: (watchlistId: number, ticker: string) => void;
   onReorderWatchlists: (fromId: number, toId: number) => void;
   onReorderStocks: (watchlistId: number, fromTicker: string, toTicker: string) => void;
   onMoveStock: (fromWatchlistId: number, toWatchlistId: number, ticker: string, toTicker: string) => void;
-  renderChart: (symbol: string) => ReactNode;
+  renderChart: (ticker: string) => ReactNode;
 };
 
 export function WatchlistModule({
@@ -38,16 +38,16 @@ export function WatchlistModule({
   onDeleteWatchlist,
   onSelectTicker,
   onRemoveTicker,
-  onExportWatchlistCsv,
-  onAddSymbol,
+  onExportWatchlist,
+  onAddTicker,
   onReorderWatchlists,
   onReorderStocks,
   onMoveStock,
   renderChart
 }: WatchlistModuleProps) {
   const [ctxMenu, setCtxMenu] = useState<CtxMenu | null>(null);
-  const [addSymbolModal, setAddSymbolModal] = useState<{ watchlistId: number } | null>(null);
-  const [newSymbol, setNewSymbol] = useState("");
+  const [addTickerModal, setAddTickerModal] = useState<{ watchlistId: number } | null>(null);
+  const [newTicker, setNewTicker] = useState("");
   const [dragOver, setDragOver] = useState<DragOver>(null);
   const dragState = useRef<{ type: "watchlist" | "stock"; watchlistId: number; ticker?: string } | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -59,11 +59,11 @@ export function WatchlistModule({
   }, []);
 
   useEffect(() => {
-    if (addSymbolModal) {
-      setNewSymbol("");
+    if (addTickerModal) {
+      setNewTicker("");
       setTimeout(() => searchInputRef.current?.focus(), 50);
     }
-  }, [addSymbolModal]);
+  }, [addTickerModal]);
 
   function openWlContextMenu(event: MouseEvent, watchlistId: number) {
     event.preventDefault();
@@ -273,7 +273,7 @@ export function WatchlistModule({
             <>
               <button
                 onClick={() => {
-                  setAddSymbolModal({ watchlistId: ctxMenu.watchlistId });
+                  setAddTickerModal({ watchlistId: ctxMenu.watchlistId });
                   setCtxMenu(null);
                 }}
               >
@@ -281,7 +281,7 @@ export function WatchlistModule({
               </button>
               <button
                 onClick={() => {
-                  onExportWatchlistCsv(ctxMenu.watchlistId);
+                  onExportWatchlist(ctxMenu.watchlistId);
                   setCtxMenu(null);
                 }}
               >
@@ -302,9 +302,9 @@ export function WatchlistModule({
         </div>
       )}
 
-      {/* ── Add Symbol modal ── */}
-      {addSymbolModal && (
-        <div className="dialog-backdrop" onClick={() => setAddSymbolModal(null)}>
+      {/* ── Add Ticker modal ── */}
+      {addTickerModal && (
+        <div className="dialog-backdrop" onClick={() => setAddTickerModal(null)}>
           <section
             className="dialog-panel wl-add-dialog"
             onClick={(event) => event.stopPropagation()}
@@ -312,14 +312,14 @@ export function WatchlistModule({
             <div className="wl-add-header">
               <span className="wl-add-title">
                 Add Ticker
-                {watchlists.find((w) => w.id === addSymbolModal.watchlistId)?.name
-                  ? ` — ${watchlists.find((w) => w.id === addSymbolModal.watchlistId)!.name}`
+                {watchlists.find((w) => w.id === addTickerModal.watchlistId)?.name
+                  ? ` — ${watchlists.find((w) => w.id === addTickerModal.watchlistId)!.name}`
                   : ""}
               </span>
               <button
                 className="wl-add-close"
                 aria-label="Close"
-                onClick={() => setAddSymbolModal(null)}
+                onClick={() => setAddTickerModal(null)}
               >
                 ✕
               </button>
@@ -331,18 +331,18 @@ export function WatchlistModule({
                 <input
                   ref={searchInputRef}
                   className="wl-search-input"
-                  value={newSymbol}
-                  onChange={(event) => setNewSymbol(event.target.value)}
+                  value={newTicker}
+                  onChange={(event) => setNewTicker(event.target.value)}
                   placeholder="Enter ticker (e.g. NVDA)"
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" && newSymbol.trim()) {
-                      onAddSymbol(addSymbolModal.watchlistId, newSymbol.trim().toUpperCase());
-                      setAddSymbolModal(null);
+                    if (event.key === "Enter" && newTicker.trim()) {
+                      onAddTicker(addTickerModal.watchlistId, newTicker.trim().toUpperCase());
+                      setAddTickerModal(null);
                     }
                   }}
                 />
-                {newSymbol && (
-                  <button className="wl-search-clear" onClick={() => setNewSymbol("")}>
+                {newTicker && (
+                  <button className="wl-search-clear" onClick={() => setNewTicker("")}>
                     ✕
                   </button>
                 )}
@@ -350,16 +350,16 @@ export function WatchlistModule({
             </div>
 
             <div className="wl-add-footer">
-              <button className="btn-secondary" onClick={() => setAddSymbolModal(null)}>
+              <button className="btn-secondary" onClick={() => setAddTickerModal(null)}>
                 Cancel
               </button>
               <button
                 className="btn-primary"
-                disabled={!newSymbol.trim()}
+                disabled={!newTicker.trim()}
                 onClick={() => {
-                  if (!newSymbol.trim()) return;
-                  onAddSymbol(addSymbolModal.watchlistId, newSymbol.trim().toUpperCase());
-                  setAddSymbolModal(null);
+                  if (!newTicker.trim()) return;
+                  onAddTicker(addTickerModal.watchlistId, newTicker.trim().toUpperCase());
+                  setAddTickerModal(null);
                 }}
               >
                 Add

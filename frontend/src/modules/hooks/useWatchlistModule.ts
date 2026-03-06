@@ -61,19 +61,7 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
     }
   }, [activeChartTicker, onMessage]);
 
-  const exportActiveWatchlist = useCallback(() => {
-    if (!activeWatchlist) return;
-    const content = activeWatchlist.tickers.join("\n");
-    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${activeWatchlist.name}_${new Date().toISOString().slice(0, 10)}.txt`;
-    anchor.click();
-    URL.revokeObjectURL(url);
-  }, [activeWatchlist]);
-
-  const exportWatchlistCsv = useCallback((watchlistId: number) => {
+  const exportWatchlist = useCallback((watchlistId: number) => {
     const target = watchlists.find((item) => item.id === watchlistId);
     if (!target) return;
     const rows = target.tickers.join("\n");
@@ -81,12 +69,12 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `watchlist_${new Date().toISOString().slice(0, 10)}.txt`;
+    anchor.download = `${target.name}_${new Date().toISOString().slice(0, 10)}.txt`;
     anchor.click();
     URL.revokeObjectURL(url);
   }, [watchlists]);
 
-  const addSymbol = useCallback(async (watchlistId: number, ticker: string) => {
+  const addTicker = useCallback(async (watchlistId: number, ticker: string) => {
     const normalized = ticker.trim().toUpperCase();
     if (!normalized) return;
     try {
@@ -96,7 +84,7 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
       setActiveChartTicker(normalized);
       onMessage(`Added ${normalized}`);
     } catch (err) {
-      onMessage(err instanceof Error ? err.message : "Failed to add symbol");
+      onMessage(err instanceof Error ? err.message : "Failed to add ticker");
     }
   }, [loadWatchlists, onMessage]);
 
@@ -189,9 +177,8 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
     loadWatchlists,
     removeFromWatchlist,
     removeWatchlist,
-    exportActiveWatchlist,
-    exportWatchlistCsv,
-    addSymbol,
+    addTicker,
+    exportWatchlist,
     reorderWatchlists,
     reorderStockWithinWatchlist,
     moveStockBetweenWatchlists

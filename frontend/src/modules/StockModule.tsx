@@ -37,7 +37,7 @@ type StockModuleProps = {
   totalPages: number;
   paginationItems: Array<number | "...">;
   onToggleSelectMode: () => void;
-  onOpenNewImport: () => void;
+  onOpenCreateStock: () => void;
   onExportSelectedTickers: () => void;
   onOpenWatchlistModal: (mode: "selected" | "filtered") => void;
   onArchiveSelectedStocks: () => void;
@@ -93,7 +93,7 @@ export function StockModule(props: StockModuleProps) {
     totalPages,
     paginationItems,
     onToggleSelectMode,
-    onOpenNewImport,
+    onOpenCreateStock,
     onExportSelectedTickers,
     onOpenWatchlistModal,
     onArchiveSelectedStocks,
@@ -120,9 +120,9 @@ export function StockModule(props: StockModuleProps) {
   } = props;
 
   return (
-    <section className="panel module2-panel">
-      {toast ? <div className="module2-toast">{toast}</div> : null}
-      <div className="module2-topbar">
+    <section className="panel stock-panel">
+      {toast ? <div className="stock-toast">{toast}</div> : null}
+      <div className="stock-topbar">
         <div>
           <h2>Stocks</h2>
           <p>{totalStocks} total stocks</p>
@@ -131,14 +131,14 @@ export function StockModule(props: StockModuleProps) {
           <button className={`btn-secondary ${isSelectMode ? "active" : ""}`} onClick={onToggleSelectMode}>
             {isSelectMode ? "Exit Select" : "Select"}
           </button>
-          <button className="btn-primary" onClick={onOpenNewImport}>+ Create</button>
+          <button className="btn-primary" onClick={onOpenCreateStock}>+ Create</button>
         </div>
       </div>
 
       {isSelectMode ? (
-        <div className="module2-bulkbar">
-          <span className="module2-bulkcount">{selectedTickers.length} selected</span>
-          <div className="module2-bulk-spacer" />
+        <div className="stock-bulkbar">
+          <span className="stock-bulkcount">{selectedTickers.length} selected</span>
+          <div className="stock-bulk-spacer" />
           <button className="btn-secondary" onClick={onExportSelectedTickers} disabled={selectedTickers.length === 0}>Export</button>
           <button className="btn-secondary" onClick={() => onOpenWatchlistModal("selected")} disabled={selectedTickers.length === 0}>★ New Watchlist</button>
           <button className="btn-secondary" onClick={onArchiveSelectedStocks} disabled={selectedTickers.length === 0}>Archive</button>
@@ -146,9 +146,9 @@ export function StockModule(props: StockModuleProps) {
         </div>
       ) : null}
 
-      <div className="toolbar toolbar-main module2-filters">
-        <div className="module2-search-wrap">
-          <input className="module2-search-input" value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search stocks…" />
+      <div className="toolbar toolbar-main stock-filters">
+        <div className="stock-search-wrap">
+          <input className="stock-search-input" value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search stocks…" />
         </div>
         <div className="filter-select-wrap">
           <select value={categoryFilter} onChange={(e) => onCategoryFilterChange(e.target.value)}>
@@ -168,7 +168,7 @@ export function StockModule(props: StockModuleProps) {
             {watchlistNames.map((name) => <option key={name} value={name}>{name}</option>)}
           </select>
         </div>
-        <div className="module2-segmented">
+        <div className="stock-segmented">
           <button className={archivedFilter === "all" ? "active" : ""} onClick={() => onArchivedFilterChange("all")}>All</button>
           <button className={archivedFilter === "active" ? "active" : ""} onClick={() => onArchivedFilterChange("active")}>Active</button>
           <button className={archivedFilter === "archived" ? "active" : ""} onClick={() => onArchivedFilterChange("archived")}>Archived</button>
@@ -179,7 +179,7 @@ export function StockModule(props: StockModuleProps) {
 
       {error && <div className="error">{error}</div>}
       {loading ? (
-        <div className="module2-loading">Loading...</div>
+        <div className="stock-loading">Loading...</div>
       ) : (
         <div className="table-wrap">
           <table>

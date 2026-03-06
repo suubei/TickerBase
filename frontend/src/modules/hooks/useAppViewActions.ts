@@ -6,7 +6,7 @@ type UseAppViewActionsOptions = {
   totalPages: number;
   toggleRowSelected: (ticker: string) => void;
   setSelected: Dispatch<SetStateAction<Stock | null>>;
-  openEditImport: (stock: Stock) => Promise<void>;
+  openEditStock: (stock: Stock) => Promise<void>;
   setCurrentPage: Dispatch<SetStateAction<number>>;
   archiveSelectedStocks: () => Promise<void>;
   unarchiveSelectedStocks: () => Promise<void>;
@@ -20,7 +20,7 @@ type UseAppViewActionsOptions = {
   toggleTagFromDropdown: (name: string) => Promise<void>;
   createTagFromDropdown: () => Promise<void>;
   selectReport: (reportId: number) => Promise<void>;
-  submitImport: () => Promise<void>;
+  submitEditor: () => Promise<void>;
 };
 
 export function useAppViewActions({
@@ -28,7 +28,7 @@ export function useAppViewActions({
   totalPages,
   toggleRowSelected,
   setSelected,
-  openEditImport,
+  openEditStock,
   setCurrentPage,
   archiveSelectedStocks,
   unarchiveSelectedStocks,
@@ -42,7 +42,7 @@ export function useAppViewActions({
   toggleTagFromDropdown,
   createTagFromDropdown,
   selectReport,
-  submitImport
+  submitEditor
 }: UseAppViewActionsOptions) {
   const onStockRowClick = useCallback((stock: Stock) => {
     if (isSelectMode) {
@@ -53,8 +53,8 @@ export function useAppViewActions({
   }, [isSelectMode, setSelected, toggleRowSelected]);
 
   const onEditStock = useCallback((stock: Stock) => {
-    void openEditImport(stock);
-  }, [openEditImport]);
+    void openEditStock(stock);
+  }, [openEditStock]);
 
   const onArchiveSelectedStocks = useCallback(() => {
     void archiveSelectedStocks();
@@ -113,9 +113,9 @@ export function useAppViewActions({
     void selectReport(reportId);
   }, [selectReport]);
 
-  const onSubmitImport = useCallback(() => {
-    void submitImport();
-  }, [submitImport]);
+  const onSubmitEditor = useCallback(() => {
+    void submitEditor();
+  }, [submitEditor]);
 
   const onCloseReport = useCallback(() => {
     setSelected(null);
@@ -138,7 +138,7 @@ export function useAppViewActions({
     onToggleTag,
     onCreateTag,
     onSelectReport,
-    onSubmitImport,
+    onSubmitEditor,
     onCloseReport
   };
 }

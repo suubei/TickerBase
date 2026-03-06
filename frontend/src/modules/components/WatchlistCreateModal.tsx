@@ -25,7 +25,7 @@ export function WatchlistCreateModal({
 
   return (
     <div className="dialog-backdrop" onClick={onClose}>
-      <section className="module2-watchlist-modal" onClick={(e) => e.stopPropagation()}>
+      <section className="watchlist-create-modal" onClick={(e) => e.stopPropagation()}>
         <h2>New Watchlist</h2>
         <p className="muted-text">
           {(mode === "selected" ? selectedCount : filteredCount)} stock(s) will be added
@@ -35,7 +35,7 @@ export function WatchlistCreateModal({
           onChange={(e) => onNameChange(e.target.value)}
           placeholder="Watchlist name..."
         />
-        {error ? <p className="module2-modal-error">{error}</p> : null}
+        {error ? <p className="watchlist-create-modal-error">{error}</p> : null}
         <div className="actions">
           <button className="btn-secondary" onClick={onClose}>
             Cancel

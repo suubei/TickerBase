@@ -1,1 +1,1 @@
-export type ActiveModule = "stockModule" | "watchlistModule" | "settingModule";
+export type ActiveModule = "stockModule" | "watchlistModule" | "settingsModule";
