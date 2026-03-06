@@ -74,6 +74,15 @@ export function TagEditorDropdown({
                   onChange={() => onToggleTag(name)}
                 />
                 <span>{name}</span>
+                {checked && (
+                  <button
+                    className="tag-dropdown-item-remove"
+                    onClick={(e) => { e.preventDefault(); onToggleTag(name); }}
+                    aria-label={`Remove ${name}`}
+                  >
+                    ✕
+                  </button>
+                )}
               </label>
             );
           })}
