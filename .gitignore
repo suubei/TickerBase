@@ -7,3 +7,6 @@ backend/dist
 frontend/dist
 .DS_Store
 frontend/demo/
+
+产品规格文档.md
+tasks.md
