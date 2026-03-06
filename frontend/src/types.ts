@@ -16,7 +16,7 @@ export type Stock = {
   themes: string[];
   categories: string[];
   themeBenefit: string | null;
-  themePhase: number | null;
+  themePhase: string | null;
   rawJson: string | null;
   isArchived: boolean;
   createdAt: string;

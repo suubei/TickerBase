@@ -7,14 +7,21 @@ export function normalizeTicker(ticker: string): string {
   return ticker.trim().toUpperCase();
 }
 
+function pickString(input: Record<string, unknown>, ...keys: string[]): string | null {
+  for (const key of keys) {
+    if (typeof input[key] === "string") return input[key] as string;
+  }
+  return null;
+}
+
 export function extractStockFields(input: Record<string, unknown>) {
   return {
-    companyName: typeof input.company_name === "string" ? input.company_name : null,
-    summary: typeof input.summary === "string" ? input.summary : null,
-    risk: typeof input.risk === "string" ? input.risk : null,
-    catalyst: typeof input.catalyst === "string" ? input.catalyst : null,
-    themeBenefit: typeof input.theme_benefit === "string" ? input.theme_benefit : null,
-    themePhase: typeof input.theme_phase === "number" ? input.theme_phase : null,
+    companyName: pickString(input, "companyName", "company_name"),
+    summary: pickString(input, "summary"),
+    risk: pickString(input, "risk"),
+    catalyst: pickString(input, "catalyst"),
+    themeBenefit: pickString(input, "themeBenefit", "theme_benefit"),
+    themePhase: pickString(input, "themePhase", "theme_phase"),
     rawJson: JSON.stringify(input)
   };
 }

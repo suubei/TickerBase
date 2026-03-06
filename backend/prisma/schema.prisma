@@ -15,7 +15,7 @@ model Stock {
   risk         String?
   catalyst     String?
   themeBenefit String?
-  themePhase   Int?
+  themePhase   String?
   rawJson      String?
   isArchived   Boolean   @default(false)
   createdAt    DateTime  @default(now())

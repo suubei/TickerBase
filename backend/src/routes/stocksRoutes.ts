@@ -91,8 +91,8 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
       updated = Boolean(existing);
     }
 
-    const themeNames = extractNameList(payloadObj.theme);
-    const categoryNames = extractNameList(payloadObj.category);
+    const themeNames = extractNameList(payloadObj.themes ?? payloadObj.theme);
+    const categoryNames = extractNameList(payloadObj.categories ?? payloadObj.category);
 
     if (themeNames.length > 0 || categoryNames.length > 0) {
       await prisma.$transaction(async (tx) => {
