@@ -172,17 +172,17 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
             orderBy: { version: "desc" },
             take: 1
           },
-          memberships: {
+          watchlistStocks: {
             include: {
               watchlist: true
             }
           },
-          stockThemes: {
+          themeLinks: {
             include: {
               theme: true
             }
           },
-          stockCategories: {
+          categoryLinks: {
             include: {
               category: true
             }
@@ -288,15 +288,15 @@ export function createStocksRoutes({ prisma, reportsDir }: StocksRoutesOptions) 
     const updated = await prisma.stock.findUnique({
       where: { ticker },
       include: {
-        stockThemes: { include: { theme: true } },
-        stockCategories: { include: { category: true } }
+        themeLinks: { include: { theme: true } },
+        categoryLinks: { include: { category: true } }
       }
     });
 
     res.json({
       ticker,
-      themes: updated?.stockThemes.map((item) => item.theme.name) ?? [],
-      categories: updated?.stockCategories.map((item) => item.category.name) ?? []
+      themes: updated?.themeLinks.map((item) => item.theme.name) ?? [],
+      categories: updated?.categoryLinks.map((item) => item.category.name) ?? []
     });
   }));
 

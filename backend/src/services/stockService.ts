@@ -69,7 +69,7 @@ export function getStockWhereFromQuery(query: express.Request["query"]): Prisma.
   }
 
   if (theme) {
-    where.stockThemes = {
+    where.themeLinks = {
       some: {
         theme: { name: theme }
       }
@@ -77,7 +77,7 @@ export function getStockWhereFromQuery(query: express.Request["query"]): Prisma.
   }
 
   if (category) {
-    where.stockCategories = {
+    where.categoryLinks = {
       some: {
         category: { name: category }
       }
@@ -85,7 +85,7 @@ export function getStockWhereFromQuery(query: express.Request["query"]): Prisma.
   }
 
   if (watchlist) {
-    where.memberships = {
+    where.watchlistStocks = {
       some: {
         watchlist: { name: watchlist }
       }
@@ -120,16 +120,16 @@ export function getStockOrderByFromQuery(query: express.Request["query"]): Prism
 
 export function mapStockDto(stock: {
   reports: Array<{ id: number; stockId: number; filePath: string; generatedAt: Date; version: number }>;
-  memberships: Array<{ watchlist: { name: string } }>;
-  stockThemes: Array<{ theme: { name: string } }>;
-  stockCategories: Array<{ category: { name: string } }>;
+  watchlistStocks: Array<{ watchlist: { name: string } }>;
+  themeLinks: Array<{ theme: { name: string } }>;
+  categoryLinks: Array<{ category: { name: string } }>;
 } & Record<string, unknown>) {
   return {
     ...stock,
-    themes: stock.stockThemes.map((item) => item.theme.name),
-    categories: stock.stockCategories.map((item) => item.category.name),
+    themes: stock.themeLinks.map((item) => item.theme.name),
+    categories: stock.categoryLinks.map((item) => item.category.name),
     latestReport: stock.reports[0] ?? null,
-    watchlists: stock.memberships.map((m) => m.watchlist.name)
+    watchlists: stock.watchlistStocks.map((m) => m.watchlist.name)
   };
 }
 
