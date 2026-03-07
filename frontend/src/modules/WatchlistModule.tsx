@@ -58,6 +58,42 @@ export function WatchlistModule({
     return () => window.removeEventListener("click", close);
   }, []);
 
+  // Keyboard navigation: Space / ArrowDown = next ticker, ArrowUp = previous ticker
+  useEffect(() => {
+    if (addTickerModal) return;
+
+    // Collect all tickers across all expanded watchlists in order
+    const allTickers: string[] = [];
+    for (const wl of watchlists) {
+      if (expandedWatchlistId === wl.id) {
+        for (const t of wl.tickers) allTickers.push(t);
+      }
+    }
+    if (allTickers.length === 0) return;
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key !== " " && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      e.preventDefault();
+
+      const activeTicker = activeChartTicker.includes(":")
+        ? activeChartTicker.split(":")[1]
+        : activeChartTicker;
+      const currentIndex = allTickers.indexOf(activeTicker);
+
+      let nextIndex: number;
+      if (e.key === "ArrowUp") {
+        nextIndex = currentIndex <= 0 ? allTickers.length - 1 : currentIndex - 1;
+      } else {
+        nextIndex = currentIndex >= allTickers.length - 1 ? 0 : currentIndex + 1;
+      }
+      onSelectTicker(allTickers[nextIndex]);
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [watchlists, expandedWatchlistId, activeChartTicker, addTickerModal, onSelectTicker]);
+
   useEffect(() => {
     if (addTickerModal) {
       setNewTicker("");
