@@ -203,6 +203,8 @@ function App() {
     setTagSearch,
     openTagDropdown,
     toggleTagFromDropdown,
+    renameTagFromDropdown,
+    deleteTagFromDropdown,
     createTagFromDropdown
   } = useTagEditorModule({
     onMessage: setMessage,
@@ -226,6 +228,8 @@ function App() {
     onDeleteWatchlist,
     onRemoveTicker,
     onToggleTag,
+    onRenameTag,
+    onDeleteTag,
     onCreateTag,
     onSelectReport,
     onSubmitEditor,
@@ -247,6 +251,8 @@ function App() {
     removeWatchlist,
     removeFromWatchlist,
     toggleTagFromDropdown,
+    renameTagFromDropdown,
+    deleteTagFromDropdown,
     createTagFromDropdown,
     selectReport,
     submitEditor
@@ -400,6 +406,8 @@ function App() {
         onClose={() => setTagDropdown(null)}
         onTagSearchChange={setTagSearch}
         onToggleTag={onToggleTag}
+        onRenameTag={onRenameTag}
+        onDeleteTag={onDeleteTag}
         onNewTagNameChange={setNewTagName}
         onCreateTag={onCreateTag}
       />

@@ -7,6 +7,8 @@ type TagDropdownState = {
   selectedValues: string[];
 };
 
+import { useState } from "react";
+
 type TagEditorDropdownProps = {
   tagDropdown: TagDropdownState | null;
   tagSearch: string;
@@ -15,6 +17,7 @@ type TagEditorDropdownProps = {
   onClose: () => void;
   onTagSearchChange: (value: string) => void;
   onToggleTag: (name: string) => void;
+  onRenameTag: (oldName: string, newName: string) => void;
   onDeleteTag: (name: string) => void;
   onNewTagNameChange: (value: string) => void;
   onCreateTag: () => void;
@@ -28,16 +31,32 @@ export function TagEditorDropdown({
   onClose,
   onTagSearchChange,
   onToggleTag,
+  onRenameTag,
   onDeleteTag,
   onNewTagNameChange,
   onCreateTag
 }: TagEditorDropdownProps) {
+  const [editingName, setEditingName] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+
   if (!tagDropdown) return null;
 
   const isTheme = tagDropdown.kind === "theme";
   const filtered = tagNames.filter((name) =>
     name.toLowerCase().includes(tagSearch.toLowerCase())
   );
+
+  function startEdit(name: string) {
+    setEditingName(name);
+    setEditValue(name);
+  }
+
+  function commitEdit(name: string) {
+    if (editValue.trim() && editValue.trim() !== name) {
+      onRenameTag(name, editValue.trim());
+    }
+    setEditingName(null);
+  }
 
   return (
     <div className="tag-dropdown-backdrop" onClick={onClose}>
@@ -68,22 +87,47 @@ export function TagEditorDropdown({
           )}
           {filtered.map((name) => {
             const checked = tagDropdown.selectedValues.includes(name);
+            const isEditing = editingName === name;
             return (
-              <label key={`dropdown-${tagDropdown.kind}-${name}`} className={`tag-dropdown-item ${checked ? "checked" : ""}`}>
+              <div key={`dropdown-${tagDropdown.kind}-${name}`} className={`tag-dropdown-item ${checked ? "checked" : ""}`}>
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => onToggleTag(name)}
                 />
-                <span>{name}</span>
+                {isEditing ? (
+                  <input
+                    className="tag-dropdown-item-edit-input"
+                    value={editValue}
+                    autoFocus
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitEdit(name);
+                      if (e.key === "Escape") setEditingName(null);
+                    }}
+                    onBlur={() => commitEdit(name)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span>{name}</span>
+                )}
+                <button
+                  className="tag-dropdown-item-action"
+                  onClick={(e) => { e.preventDefault(); startEdit(name); }}
+                  aria-label={`Rename ${name}`}
+                  title="Rename"
+                >
+                  ✎
+                </button>
                 <button
                   className="tag-dropdown-item-remove"
                   onClick={(e) => { e.preventDefault(); onDeleteTag(name); }}
                   aria-label={`Delete ${name}`}
+                  title="Delete"
                 >
                   ✕
                 </button>
-              </label>
+              </div>
             );
           })}
         </div>
