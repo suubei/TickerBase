@@ -18,6 +18,8 @@ type UseAppViewActionsOptions = {
   removeWatchlist: (id: number) => Promise<void>;
   removeFromWatchlist: (watchlistId: number, ticker: string) => Promise<void>;
   toggleTagFromDropdown: (name: string) => Promise<void>;
+  renameTagFromDropdown: (oldName: string, newName: string) => Promise<void>;
+  deleteTagFromDropdown: (name: string) => Promise<void>;
   createTagFromDropdown: () => Promise<void>;
   selectReport: (reportId: number) => Promise<void>;
   submitEditor: () => Promise<void>;
@@ -40,6 +42,8 @@ export function useAppViewActions({
   removeWatchlist,
   removeFromWatchlist,
   toggleTagFromDropdown,
+  renameTagFromDropdown,
+  deleteTagFromDropdown,
   createTagFromDropdown,
   selectReport,
   submitEditor
@@ -105,6 +109,14 @@ export function useAppViewActions({
     void toggleTagFromDropdown(name);
   }, [toggleTagFromDropdown]);
 
+  const onRenameTag = useCallback((oldName: string, newName: string) => {
+    void renameTagFromDropdown(oldName, newName);
+  }, [renameTagFromDropdown]);
+
+  const onDeleteTag = useCallback((name: string) => {
+    void deleteTagFromDropdown(name);
+  }, [deleteTagFromDropdown]);
+
   const onCreateTag = useCallback(() => {
     void createTagFromDropdown();
   }, [createTagFromDropdown]);
@@ -136,6 +148,8 @@ export function useAppViewActions({
     onDeleteWatchlist,
     onRemoveTicker,
     onToggleTag,
+    onRenameTag,
+    onDeleteTag,
     onCreateTag,
     onSelectReport,
     onSubmitEditor,
