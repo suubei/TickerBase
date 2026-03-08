@@ -15,6 +15,7 @@ type TagEditorDropdownProps = {
   onClose: () => void;
   onTagSearchChange: (value: string) => void;
   onToggleTag: (name: string) => void;
+  onDeleteTag: (name: string) => void;
   onNewTagNameChange: (value: string) => void;
   onCreateTag: () => void;
 };
@@ -27,6 +28,7 @@ export function TagEditorDropdown({
   onClose,
   onTagSearchChange,
   onToggleTag,
+  onDeleteTag,
   onNewTagNameChange,
   onCreateTag
 }: TagEditorDropdownProps) {
@@ -74,15 +76,13 @@ export function TagEditorDropdown({
                   onChange={() => onToggleTag(name)}
                 />
                 <span>{name}</span>
-                {checked && (
-                  <button
-                    className="tag-dropdown-item-remove"
-                    onClick={(e) => { e.preventDefault(); onToggleTag(name); }}
-                    aria-label={`Remove ${name}`}
-                  >
-                    ✕
-                  </button>
-                )}
+                <button
+                  className="tag-dropdown-item-remove"
+                  onClick={(e) => { e.preventDefault(); onDeleteTag(name); }}
+                  aria-label={`Delete ${name}`}
+                >
+                  ✕
+                </button>
               </label>
             );
           })}
