@@ -54,6 +54,18 @@ export const watchlistStocksReorderSchema = z.object({
   tickers: z.array(z.string().min(1))
 });
 
+export const researchCreateSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().optional().default(""),
+  tickers: z.array(z.string().min(1)).optional().default([])
+});
+
+export const researchUpdateSchema = z.object({
+  title: z.string().min(1).optional(),
+  content: z.string().optional(),
+  tickers: z.array(z.string().min(1)).optional()
+});
+
 export const reportCreateSchema = z.object({
   content: z.string().min(1)
 });

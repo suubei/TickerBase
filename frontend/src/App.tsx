@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ResearchModule } from "./modules/ResearchModule";
 import { SettingsModule } from "./modules/SettingsModule";
 import { StockModule } from "./modules/StockModule";
 import { WatchlistModule } from "./modules/WatchlistModule";
@@ -19,6 +20,7 @@ import { useSettingsActions } from "./modules/hooks/useSettingsActions";
 import { useStockTableModule } from "./modules/hooks/useStockTableModule";
 import { useTagEditorModule } from "./modules/hooks/useTagEditorModule";
 import { useWatchlistCreateModule } from "./modules/hooks/useWatchlistCreateModule";
+import { useResearchModule } from "./modules/hooks/useResearchModule";
 import { useWatchlistModule } from "./modules/hooks/useWatchlistModule";
 
 const STOCK_PAGE_SIZE = 20;
@@ -258,6 +260,36 @@ function App() {
     submitEditor
   });
 
+  const {
+    reports: researchReports,
+    activeReport: activeResearch,
+    isEditing: isResearchEditing,
+    isCreating: isResearchCreating,
+    editTitle: researchEditTitle,
+    editContent: researchEditContent,
+    editTickers: researchEditTickers,
+    tickerInput: researchTickerInput,
+    setEditTitle: setResearchEditTitle,
+    setEditContent: setResearchEditContent,
+    setTickerInput: setResearchTickerInput,
+    loadReports: loadResearchReports,
+    selectReport: selectResearch,
+    startCreate: startResearchCreate,
+    startEdit: startResearchEdit,
+    cancelEdit: cancelResearchEdit,
+    saveCreate: saveResearchCreate,
+    saveEdit: saveResearchEdit,
+    removeReport: removeResearch,
+    addTickerToEdit: addResearchTicker,
+    removeTickerFromEdit: removeResearchTicker
+  } = useResearchModule({ onMessage: setMessage });
+
+  useEffect(() => {
+    if (activeModule === "researchModule") {
+      void loadResearchReports();
+    }
+  }, [activeModule, loadResearchReports]);
+
   const { visibleColumns } = useAppBootstrap({
     jsonFieldDrafts,
     watchlistFilter,
@@ -359,6 +391,31 @@ function App() {
           onReorderStocks={reorderStockWithinWatchlist}
           onMoveStock={moveStockBetweenWatchlists}
           renderChart={(ticker) => <TradingViewAdvancedChart symbol={ticker} />}
+        />
+      ) : null}
+
+      {activeModule === "researchModule" ? (
+        <ResearchModule
+          reports={researchReports}
+          activeReport={activeResearch}
+          isEditing={isResearchEditing}
+          isCreating={isResearchCreating}
+          editTitle={researchEditTitle}
+          editContent={researchEditContent}
+          editTickers={researchEditTickers}
+          tickerInput={researchTickerInput}
+          onSelectReport={selectResearch}
+          onStartCreate={startResearchCreate}
+          onStartEdit={startResearchEdit}
+          onCancelEdit={cancelResearchEdit}
+          onSaveCreate={() => void saveResearchCreate()}
+          onSaveEdit={() => void saveResearchEdit()}
+          onDeleteReport={(id) => void removeResearch(id)}
+          onEditTitleChange={setResearchEditTitle}
+          onEditContentChange={setResearchEditContent}
+          onTickerInputChange={setResearchTickerInput}
+          onAddTicker={addResearchTicker}
+          onRemoveTicker={removeResearchTicker}
         />
       ) : null}
 

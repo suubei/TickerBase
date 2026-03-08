@@ -70,6 +70,15 @@ export type TableFieldConfig = {
   position: number;
 };
 
+export type ResearchReport = {
+  id: number;
+  title: string;
+  content: string;
+  tickers: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type SettingsPayload = {
   themes: ThemeItem[];
   categories: CategoryItem[];

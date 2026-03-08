@@ -18,12 +18,14 @@ model Stock {
   themePhase   String?
   rawJson      String?
   isArchived   Boolean   @default(false)
+  position     Int       @default(0)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   reports          Report[]
   watchlistStocks  WatchlistStock[]
   themeLinks       StockTheme[]
   categoryLinks    StockCategory[]
+  researchLinks    ResearchStock[]
 }
 
 model Report {
@@ -95,4 +97,22 @@ model StockCategory {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([stockId, categoryId])
+}
+
+model Research {
+  id           Int             @id @default(autoincrement())
+  title        String
+  content      String          @default("")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  stockLinks   ResearchStock[]
+}
+
+model ResearchStock {
+  researchId  Int
+  stockId     Int
+  research    Research @relation(fields: [researchId], references: [id], onDelete: Cascade)
+  stock       Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+
+  @@id([researchId, stockId])
 }

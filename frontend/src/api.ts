@@ -1,6 +1,7 @@
 import type {
   CategoryItem,
   ReportMeta,
+  ResearchReport,
   SettingsPayload,
   Stock,
   StocksPage,
@@ -204,6 +205,28 @@ export async function deleteCategory(id: number) {
   return request<void>(`/settings/categories/${id}`, {
     method: "DELETE"
   });
+}
+
+export async function getResearchList() {
+  return request<ResearchReport[]>("/research");
+}
+
+export async function createResearch(payload: { title: string; content?: string; tickers?: string[] }) {
+  return request<ResearchReport>("/research", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function updateResearch(id: number, payload: { title?: string; content?: string; tickers?: string[] }) {
+  return request<ResearchReport>(`/research/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function deleteResearch(id: number) {
+  return request<void>(`/research/${id}`, { method: "DELETE" });
 }
 
 export async function saveTableFields(fields: Array<Omit<TableFieldConfig, "id">>) {

@@ -33,6 +33,14 @@ export function SideMenu({ isCollapsed, activeModule, onToggleCollapse, onSelect
           <span className="menu-label">Watchlist</span>
         </button>
         <button
+          className={`menu-item ${activeModule === "researchModule" ? "active" : ""}`}
+          onClick={() => onSelectModule("researchModule")}
+          title="Research"
+        >
+          <span className="menu-icon">🔬</span>
+          <span className="menu-label">Research</span>
+        </button>
+        <button
           className={`menu-item ${activeModule === "settingsModule" ? "active" : ""}`}
           onClick={() => onSelectModule("settingsModule")}
           title="Settings"

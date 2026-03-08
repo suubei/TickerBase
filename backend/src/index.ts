@@ -3,6 +3,7 @@ import express from "express";
 import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { createHealthRoutes } from "./routes/healthRoutes";
+import { createResearchRoutes } from "./routes/researchRoutes";
 import { createSettingsRoutes } from "./routes/settingsRoutes";
 import { createStocksRoutes } from "./routes/stocksRoutes";
 import { createWatchlistRoutes } from "./routes/watchlistRoutes";
@@ -19,6 +20,7 @@ app.use("/api", createHealthRoutes());
 app.use("/api", createStocksRoutes({ prisma, reportsDir }));
 app.use("/api", createWatchlistRoutes({ prisma }));
 app.use("/api", createSettingsRoutes({ prisma }));
+app.use("/api", createResearchRoutes({ prisma }));
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (err instanceof SyntaxError) {
