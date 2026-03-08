@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { marked } from "marked";
 import type { ResearchReport } from "../types";
+
+marked.setOptions({ gfm: true, breaks: true });
 
 type ResearchModuleProps = {
   reports: ResearchReport[];
@@ -47,83 +49,95 @@ export function ResearchModule({
   onAddTicker,
   onRemoveTicker
 }: ResearchModuleProps) {
-  const [isPreview, setIsPreview] = useState(false);
-  const contentHtml = useMemo(
-    () => marked.parse((isEditing ? editContent : activeReport?.content) ?? "") as string,
-    [isEditing, editContent, activeReport?.content]
-  );
-
+  const [showPreview, setShowPreview] = useState(false);
   const showEditor = isEditing || isCreating;
 
   return (
     <section className="panel research-panel">
       <div className="research-layout">
 
-        {/* ── Left sidebar: report list ── */}
+        {/* ── Left sidebar ── */}
         <aside className="research-sidebar">
           <div className="research-sidebar-header">
-            <span>Research</span>
-            <button className="btn-primary research-new-btn" onClick={onStartCreate}>+ New</button>
+            <div>
+              <p className="detail-vs-label">Research</p>
+              <h3 className="detail-vs-title">{reports.length} reports</h3>
+            </div>
+            <button className="detail-tbtn-primary" onClick={onStartCreate}>+ New</button>
           </div>
 
-          <div className="research-list">
+          <div className="detail-vs-list">
             {reports.length === 0 && (
               <div className="research-empty">No research reports yet</div>
             )}
             {reports.map((r) => (
               <div
                 key={r.id}
-                className={`research-list-item ${activeReport?.id === r.id ? "active" : ""}`}
+                className={`detail-vbtn ${activeReport?.id === r.id ? "active" : ""}`}
                 onClick={() => onSelectReport(r)}
               >
-                <div className="research-item-title">{r.title}</div>
-                <div className="research-item-meta">
-                  {r.tickers.length > 0 && (
-                    <span className="research-item-tickers">{r.tickers.join(", ")}</span>
-                  )}
-                  <span className="research-item-date">
-                    {new Date(r.updatedAt).toLocaleDateString()}
-                  </span>
+                <div className="detail-vbtn-row">
+                  <span className="detail-vbtn-name">{r.title}</span>
+                  <button
+                    className="detail-vbtn-delete"
+                    aria-label="Delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteReport(r.id);
+                    }}
+                  >
+                    ✕
+                  </button>
                 </div>
-                <button
-                  className="research-item-delete"
-                  onClick={(e) => { e.stopPropagation(); onDeleteReport(r.id); }}
-                  title="Delete"
-                >
-                  ✕
-                </button>
+                <p className="detail-vbtn-date">
+                  {r.tickers.length > 0 && (
+                    <span className="research-item-tickers">{r.tickers.join(", ")} · </span>
+                  )}
+                  {new Date(r.updatedAt).toLocaleDateString()}
+                </p>
               </div>
             ))}
           </div>
         </aside>
 
-        {/* ── Right: content area ── */}
-        <div className="research-content">
+        {/* ── Right content ── */}
+        <div className="detail-main">
+
+          {/* Placeholder */}
           {!activeReport && !showEditor && (
             <div className="research-placeholder">
               <p>Select a report or create a new one</p>
             </div>
           )}
 
-          {/* Editor (create or edit) */}
+          {/* Editor / Create */}
           {showEditor && (
-            <div className="research-editor">
-              <div className="research-editor-header">
-                <input
-                  className="research-title-input"
-                  placeholder="Report title…"
-                  value={editTitle}
-                  onChange={(e) => onEditTitleChange(e.target.value)}
-                />
-                <div className="research-editor-actions">
-                  <button className="btn-secondary" onClick={onCancelEdit}>Cancel</button>
-                  <button className="btn-primary" onClick={isCreating ? onSaveCreate : onSaveEdit}>
+            <>
+              {/* Toolbar */}
+              <div className="detail-toolbar">
+                <div className="detail-toolbar-left">
+                  <input
+                    className="research-title-input"
+                    placeholder="Report title…"
+                    value={editTitle}
+                    onChange={(e) => onEditTitleChange(e.target.value)}
+                  />
+                </div>
+                <div className="detail-toolbar-right">
+                  <button
+                    className={`detail-tbtn ${showPreview ? "active" : ""}`}
+                    onClick={() => setShowPreview((p) => !p)}
+                  >
+                    {showPreview ? "Hide Preview" : "Preview"}
+                  </button>
+                  <button className="detail-tbtn" onClick={onCancelEdit}>Cancel</button>
+                  <button className="detail-tbtn-primary" onClick={isCreating ? onSaveCreate : onSaveEdit}>
                     {isCreating ? "Create" : "Save"}
                   </button>
                 </div>
               </div>
 
-              {/* Ticker tags */}
+              {/* Ticker row */}
               <div className="research-tickers-row">
                 <div className="research-ticker-tags">
                   {editTickers.map((t) => (
@@ -141,63 +155,70 @@ export function ResearchModule({
                     onChange={(e) => onTickerInputChange(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onAddTicker(); } }}
                   />
-                  <button className="btn-secondary" onClick={onAddTicker}>Add</button>
+                  <button className="detail-tbtn" onClick={onAddTicker}>Add</button>
                 </div>
               </div>
 
-              {/* Markdown editor / preview toggle */}
-              <div className="research-editor-toolbar">
-                <button
-                  className={`research-preview-toggle ${isPreview ? "active" : ""}`}
-                  onClick={() => setIsPreview((p) => !p)}
-                >
-                  {isPreview ? "Edit" : "Preview"}
-                </button>
+              {/* Editor split */}
+              <div className="detail-editor-split">
+                <div className={`detail-editor-pane ${showPreview ? "" : "full"}`}>
+                  <div className="detail-pane-label">Markdown</div>
+                  <textarea
+                    className="detail-editor-textarea"
+                    placeholder="Write your research in Markdown…"
+                    value={editContent}
+                    onChange={(e) => onEditContentChange(e.target.value)}
+                    spellCheck={false}
+                  />
+                </div>
+                {showPreview && (
+                  <div className="detail-preview-pane">
+                    <div className="detail-pane-label">Preview</div>
+                    <div className="detail-preview-scroll">
+                      <article
+                        className="markdown"
+                        dangerouslySetInnerHTML={{ __html: marked.parse(editContent) as string }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {isPreview ? (
-                <article
-                  className="research-markdown-preview"
-                  dangerouslySetInnerHTML={{ __html: contentHtml }}
-                />
-              ) : (
-                <textarea
-                  className="research-textarea"
-                  placeholder="Write your research in Markdown…"
-                  value={editContent}
-                  onChange={(e) => onEditContentChange(e.target.value)}
-                  spellCheck={false}
-                />
-              )}
-            </div>
+            </>
           )}
 
           {/* View mode */}
           {activeReport && !showEditor && (
-            <div className="research-viewer">
-              <div className="research-viewer-header">
-                <div>
-                  <h2 className="research-viewer-title">{activeReport.title}</h2>
-                  <div className="research-viewer-meta">
-                    {activeReport.tickers.map((t) => (
-                      <span key={t} className="research-ticker-tag">{t}</span>
-                    ))}
-                    <span className="research-viewer-date">
-                      {new Date(activeReport.updatedAt).toLocaleDateString()}
-                    </span>
-                  </div>
+            <>
+              <div className="detail-toolbar">
+                <div className="detail-toolbar-left">
+                  <span className="detail-toolbar-ver">{activeReport.title}</span>
+                  <span className="detail-toolbar-date">
+                    {new Date(activeReport.updatedAt).toLocaleDateString()}
+                  </span>
+                  {activeReport.tickers.map((t) => (
+                    <span key={t} className="research-ticker-tag">{t}</span>
+                  ))}
                 </div>
-                <button className="btn-secondary" onClick={() => onStartEdit(activeReport)}>Edit</button>
+                <div className="detail-toolbar-right">
+                  <button className="detail-tbtn" onClick={() => onStartEdit(activeReport)}>
+                    ✎ Edit
+                  </button>
+                </div>
               </div>
-              {activeReport.content ? (
-                <article
-                  className="research-markdown-preview"
-                  dangerouslySetInnerHTML={{ __html: contentHtml }}
-                />
-              ) : (
-                <div className="research-placeholder"><p>No content yet. Click Edit to add.</p></div>
-              )}
-            </div>
+
+              <div className="detail-view-scroll">
+                <div className="detail-view-content">
+                  <article
+                    className="markdown"
+                    dangerouslySetInnerHTML={{
+                      __html: activeReport.content
+                        ? (marked.parse(activeReport.content) as string)
+                        : "<p style='color:var(--text-muted)'>No content yet. Click Edit to add.</p>"
+                    }}
+                  />
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
