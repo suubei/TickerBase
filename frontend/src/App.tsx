@@ -184,6 +184,7 @@ function App() {
     setMarkdownReport,
     isEditorOpen,
     isEditing,
+    editorError,
     closeEditor,
     submitEditor,
     openEditStock,
@@ -449,6 +450,7 @@ function App() {
         isEditing={isEditing}
         jsonPayload={jsonPayload}
         markdownReport={markdownReport}
+        error={editorError}
         onJsonPayloadChange={setJsonPayload}
         onMarkdownReportChange={setMarkdownReport}
         onClose={closeEditor}

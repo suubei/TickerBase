@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { getReportContent, importStock } from "../../api";
 import type { Stock } from "../../types";
 
+
 type UseStockEditorModuleOptions = {
   onMessage: (message: string) => void;
   reloadAfterSubmit: () => Promise<void>;
@@ -12,33 +13,41 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
   const [markdownReport, setMarkdownReport] = useState("");
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingTicker, setEditingTicker] = useState<string | null>(null);
+  const [editorError, setEditorError] = useState("");
 
   const isEditing = editingTicker !== null;
-
-  const extractTickerFromJson = useCallback((payload: string) => {
-    try {
-      const parsed = JSON.parse(payload) as Record<string, unknown>;
-      if (typeof parsed.ticker === "string" && parsed.ticker.trim()) {
-        return parsed.ticker.trim().toUpperCase();
-      }
-      return "";
-    } catch {
-      return "";
-    }
-  }, []);
 
   const closeEditor = useCallback(() => {
     setIsEditorOpen(false);
     setEditingTicker(null);
+    setEditorError("");
   }, []);
 
   const submitEditor = useCallback(async () => {
+    setEditorError("");
     onMessage("");
-    const submitTicker = extractTickerFromJson(jsonPayload);
-    if (!submitTicker) {
-      onMessage("jsonPayload 里必须包含 ticker 字段");
+
+    // Validate JSON first
+    let parsedObj: Record<string, unknown>;
+    try {
+      const p = JSON.parse(jsonPayload) as unknown;
+      if (typeof p !== "object" || p === null || Array.isArray(p)) {
+        setEditorError("JSON 必须是一个对象，例如：{ \"ticker\": \"AAPL\", … }");
+        return;
+      }
+      parsedObj = p as Record<string, unknown>;
+    } catch {
+      setEditorError("JSON 格式不正确，请检查语法（如括号、引号、逗号）");
       return;
     }
+
+    const submitTicker =
+      typeof parsedObj.ticker === "string" ? parsedObj.ticker.trim().toUpperCase() : "";
+    if (!submitTicker) {
+      setEditorError("JSON 中必须包含 ticker 字段，例如：\"ticker\": \"AAPL\"");
+      return;
+    }
+
     try {
       const result = await importStock({
         ticker: submitTicker,
@@ -61,14 +70,14 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
     } catch (err) {
       const status = (err as Error & { status?: number }).status;
       if (editingTicker && status === 409) {
-        onMessage(err instanceof Error ? err.message : "Ticker already exists");
+        setEditorError(err instanceof Error ? err.message : "Ticker already exists");
         return;
       }
       if (status === 409) {
-        const confirmed = window.confirm(`Ticker ${submitTicker.toUpperCase()} 已存在，是否更新？`);
+        const confirmed = window.confirm(`Ticker ${submitTicker} 已存在，是否更新？`);
         if (!confirmed) {
           await importStock({ ticker: submitTicker, jsonPayload, markdownReport, action: "skip" });
-          onMessage(`Skipped ${submitTicker.toUpperCase()}`);
+          onMessage(`Skipped ${submitTicker}`);
           return;
         }
         const updated = await importStock({ ticker: submitTicker, jsonPayload, markdownReport, action: "update" });
@@ -78,9 +87,9 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
         await reloadAfterSubmit();
         return;
       }
-      onMessage(err instanceof Error ? err.message : "Import failed");
+      setEditorError(err instanceof Error ? err.message : "Import failed");
     }
-  }, [closeEditor, editingTicker, extractTickerFromJson, isEditing, jsonPayload, markdownReport, onMessage, reloadAfterSubmit]);
+  }, [closeEditor, editingTicker, isEditing, jsonPayload, markdownReport, onMessage, reloadAfterSubmit]);
 
   const openEditStock = useCallback(async (stock: Stock) => {
     onMessage("");
@@ -124,6 +133,7 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
     setEditingTicker(null);
     setJsonPayload("");
     setMarkdownReport("");
+    setEditorError("");
     setIsEditorOpen(true);
   }, []);
 
@@ -136,6 +146,7 @@ export function useStockEditorModule({ onMessage, reloadAfterSubmit }: UseStockE
     setIsEditorOpen,
     editingTicker,
     isEditing,
+    editorError,
     closeEditor,
     submitEditor,
     openEditStock,

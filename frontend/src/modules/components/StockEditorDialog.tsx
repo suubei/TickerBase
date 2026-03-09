@@ -6,6 +6,7 @@ type StockEditorDialogProps = {
   isEditing: boolean;
   jsonPayload: string;
   markdownReport: string;
+  error?: string;
   onJsonPayloadChange: (value: string) => void;
   onMarkdownReportChange: (value: string) => void;
   onClose: () => void;
@@ -17,6 +18,7 @@ export function StockEditorDialog({
   isEditing,
   jsonPayload,
   markdownReport,
+  error,
   onJsonPayloadChange,
   onMarkdownReportChange,
   onClose,
@@ -96,6 +98,7 @@ export function StockEditorDialog({
         )}
 
         <div className="stock-editor-footer">
+          {error && <span className="stock-editor-error">{error}</span>}
           <button className="btn-secondary" onClick={onClose}>Cancel</button>
           <button className="btn-primary" onClick={onSubmit}>{isEditing ? "Update" : "Create"}</button>
         </div>
