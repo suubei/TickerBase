@@ -10,7 +10,6 @@ type StockRow = {
 };
 
 type StockModuleProps = {
-  toast: string;
   pageSize: number;
   stocks: Stock[];
   totalStocks: number;
@@ -25,8 +24,6 @@ type StockModuleProps = {
   themes: string[];
   watchlistNames: string[];
   hasActiveFilters: boolean;
-  message: string;
-  error: string;
   loading: boolean;
   allDisplayedSelected: boolean;
   visibleColumns: ColumnConfig[];
@@ -66,7 +63,6 @@ type StockModuleProps = {
 export function StockModule(props: StockModuleProps) {
 
   const {
-    toast,
     pageSize,
     stocks,
     totalStocks,
@@ -81,8 +77,6 @@ export function StockModule(props: StockModuleProps) {
     themes,
     watchlistNames,
     hasActiveFilters,
-    message,
-    error,
     loading,
     allDisplayedSelected,
     visibleColumns,
@@ -121,7 +115,6 @@ export function StockModule(props: StockModuleProps) {
 
   return (
     <section className="panel stock-panel">
-      {toast ? <div className="stock-toast">{toast}</div> : null}
       <div className="stock-topbar">
         <div>
           <h2>Stocks</h2>
@@ -174,10 +167,8 @@ export function StockModule(props: StockModuleProps) {
           <button className={archivedFilter === "archived" ? "active" : ""} onClick={() => onArchivedFilterChange("archived")}>Archived</button>
         </div>
         {hasActiveFilters ? <button className="btn-ghost" onClick={onClearFilters}>Clear ✕</button> : null}
-        <span className="status-text">{message}</span>
       </div>
 
-      {error && <div className="error">{error}</div>}
       {loading ? (
         <div className="stock-loading">Loading...</div>
       ) : (

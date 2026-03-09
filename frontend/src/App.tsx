@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResearchModule } from "./modules/ResearchModule";
 import { SettingsModule } from "./modules/SettingsModule";
 import { StockModule } from "./modules/StockModule";
@@ -27,6 +27,8 @@ const STOCK_PAGE_SIZE = 20;
 
 function App() {
   const [message, setMessage] = useState("");
+  const [visibleMessage, setVisibleMessage] = useState("");
+  const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
   const [activeModule, setActiveModule] = useState<ActiveModule>("stockModule");
   const {
@@ -292,6 +294,17 @@ function App() {
     }
   }, [activeModule, loadResearchReports]);
 
+  const showToastText = message || toast || error;
+  useEffect(() => {
+    if (!showToastText) return;
+    setVisibleMessage(showToastText);
+    if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
+    messageTimerRef.current = setTimeout(() => {
+      setVisibleMessage("");
+      setMessage("");
+    }, 3000);
+  }, [showToastText]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { visibleColumns } = useAppBootstrap({
     jsonFieldDrafts,
     watchlistFilter,
@@ -302,6 +315,7 @@ function App() {
   });
   return (
     <div className="app-layout">
+      {visibleMessage && <div className="app-toast">{visibleMessage}</div>}
       <SideMenu
         isCollapsed={isMenuCollapsed}
         activeModule={activeModule}
@@ -312,7 +326,6 @@ function App() {
       <div className="app-shell">
       {activeModule === "stockModule" ? (
         <StockModule
-          toast={toast}
           pageSize={STOCK_PAGE_SIZE}
           stocks={stocks}
           totalStocks={totalStocks}
@@ -327,8 +340,6 @@ function App() {
           themes={themes}
           watchlistNames={watchlistNames}
           hasActiveFilters={hasActiveFilters}
-          message={message}
-          error={error}
           loading={loading}
           allDisplayedSelected={allDisplayedSelected}
           visibleColumns={visibleColumns}
