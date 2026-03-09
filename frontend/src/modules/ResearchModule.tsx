@@ -122,6 +122,20 @@ export function ResearchModule({
                     value={editTitle}
                     onChange={(e) => onEditTitleChange(e.target.value)}
                   />
+                  {editTickers.map((t) => (
+                    <span key={t} className="research-ticker-tag">
+                      {t}
+                      <button onClick={() => onRemoveTicker(t)}>✕</button>
+                    </span>
+                  ))}
+                  <input
+                    className="research-ticker-input"
+                    placeholder="Add ticker…"
+                    value={tickerInput}
+                    onChange={(e) => onTickerInputChange(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onAddTicker(); } }}
+                  />
+                  <button className="detail-tbtn" onClick={onAddTicker}>Add</button>
                 </div>
                 <div className="detail-toolbar-right">
                   <button
@@ -137,32 +151,9 @@ export function ResearchModule({
                 </div>
               </div>
 
-              {/* Ticker row */}
-              <div className="research-tickers-row">
-                <div className="research-ticker-tags">
-                  {editTickers.map((t) => (
-                    <span key={t} className="research-ticker-tag">
-                      {t}
-                      <button onClick={() => onRemoveTicker(t)}>✕</button>
-                    </span>
-                  ))}
-                </div>
-                <div className="research-ticker-input-wrap">
-                  <input
-                    className="research-ticker-input"
-                    placeholder="Add ticker…"
-                    value={tickerInput}
-                    onChange={(e) => onTickerInputChange(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onAddTicker(); } }}
-                  />
-                  <button className="detail-tbtn" onClick={onAddTicker}>Add</button>
-                </div>
-              </div>
-
               {/* Editor split */}
               <div className="detail-editor-split">
                 <div className={`detail-editor-pane ${showPreview ? "" : "full"}`}>
-                  <div className="detail-pane-label">Markdown</div>
                   <textarea
                     className="detail-editor-textarea"
                     placeholder="Write your research in Markdown…"
