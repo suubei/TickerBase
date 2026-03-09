@@ -13,6 +13,7 @@ type ResearchModuleProps = {
   editContent: string;
   editTickers: string[];
   tickerInput: string;
+  error?: string;
   onSelectReport: (report: ResearchReport) => void;
   onStartCreate: () => void;
   onStartEdit: (report: ResearchReport) => void;
@@ -36,6 +37,7 @@ export function ResearchModule({
   editContent,
   editTickers,
   tickerInput,
+  error,
   onSelectReport,
   onStartCreate,
   onStartEdit,
@@ -138,6 +140,7 @@ export function ResearchModule({
                   <button className="detail-tbtn" onClick={onAddTicker}>Add</button>
                 </div>
                 <div className="detail-toolbar-right">
+                  {error && <span className="stock-editor-error">{error}</span>}
                   <button
                     className={`detail-tbtn ${showPreview ? "active" : ""}`}
                     onClick={() => setShowPreview((p) => !p)}

@@ -2,11 +2,7 @@ import { useCallback, useState } from "react";
 import { createResearch, deleteResearch, getResearchList, updateResearch } from "../../api";
 import type { ResearchReport } from "../../types";
 
-type UseResearchModuleOptions = {
-  onMessage: (message: string) => void;
-};
-
-export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
+export function useResearchModule() {
   const [reports, setReports] = useState<ResearchReport[]>([]);
   const [activeReport, setActiveReport] = useState<ResearchReport | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -15,20 +11,22 @@ export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
   const [editTickers, setEditTickers] = useState<string[]>([]);
   const [tickerInput, setTickerInput] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [researchError, setResearchError] = useState("");
 
   const loadReports = useCallback(async () => {
     try {
       const list = await getResearchList();
       setReports(list);
     } catch (err) {
-      onMessage(err instanceof Error ? err.message : "Failed to load research reports");
+      setResearchError(err instanceof Error ? err.message : "Failed to load research reports");
     }
-  }, [onMessage]);
+  }, []);
 
   const selectReport = useCallback((report: ResearchReport) => {
     setActiveReport(report);
     setIsEditing(false);
     setIsCreating(false);
+    setResearchError("");
   }, []);
 
   const startCreate = useCallback(() => {
@@ -39,6 +37,7 @@ export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
     setEditContent("");
     setEditTickers([]);
     setTickerInput("");
+    setResearchError("");
   }, []);
 
   const startEdit = useCallback((report: ResearchReport) => {
@@ -48,15 +47,18 @@ export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
     setEditContent(report.content);
     setEditTickers([...report.tickers]);
     setTickerInput("");
+    setResearchError("");
   }, []);
 
   const cancelEdit = useCallback(() => {
     setIsEditing(false);
     setIsCreating(false);
+    setResearchError("");
   }, []);
 
   const saveCreate = useCallback(async () => {
-    if (!editTitle.trim()) { onMessage("Title is required"); return; }
+    if (!editTitle.trim()) { setResearchError("Title is required"); return; }
+    setResearchError("");
     try {
       const created = await createResearch({
         title: editTitle.trim(),
@@ -66,15 +68,15 @@ export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
       await loadReports();
       setActiveReport(created);
       setIsCreating(false);
-      onMessage(`Created "${created.title}"`);
     } catch (err) {
-      onMessage(err instanceof Error ? err.message : "Failed to create report");
+      setResearchError(err instanceof Error ? err.message : "Failed to create report");
     }
-  }, [editContent, editTickers, editTitle, loadReports, onMessage]);
+  }, [editContent, editTickers, editTitle, loadReports]);
 
   const saveEdit = useCallback(async () => {
     if (!activeReport) return;
-    if (!editTitle.trim()) { onMessage("Title is required"); return; }
+    if (!editTitle.trim()) { setResearchError("Title is required"); return; }
+    setResearchError("");
     try {
       const updated = await updateResearch(activeReport.id, {
         title: editTitle.trim(),
@@ -84,11 +86,10 @@ export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
       setReports((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
       setActiveReport(updated);
       setIsEditing(false);
-      onMessage(`Saved "${updated.title}"`);
     } catch (err) {
-      onMessage(err instanceof Error ? err.message : "Failed to save report");
+      setResearchError(err instanceof Error ? err.message : "Failed to save report");
     }
-  }, [activeReport, editContent, editTickers, editTitle, onMessage]);
+  }, [activeReport, editContent, editTickers, editTitle]);
 
   const removeReport = useCallback(async (id: number) => {
     try {
@@ -96,9 +97,9 @@ export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
       setReports((prev) => prev.filter((r) => r.id !== id));
       if (activeReport?.id === id) setActiveReport(null);
     } catch (err) {
-      onMessage(err instanceof Error ? err.message : "Failed to delete report");
+      setResearchError(err instanceof Error ? err.message : "Failed to delete report");
     }
-  }, [activeReport, onMessage]);
+  }, [activeReport]);
 
   const addTickerToEdit = useCallback(() => {
     const t = tickerInput.trim().toUpperCase();
@@ -121,6 +122,7 @@ export function useResearchModule({ onMessage }: UseResearchModuleOptions) {
     editContent,
     editTickers,
     tickerInput,
+    researchError,
     setEditTitle,
     setEditContent,
     setTickerInput,

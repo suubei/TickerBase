@@ -270,6 +270,7 @@ function App() {
     editContent: researchEditContent,
     editTickers: researchEditTickers,
     tickerInput: researchTickerInput,
+    researchError,
     setEditTitle: setResearchEditTitle,
     setEditContent: setResearchEditContent,
     setTickerInput: setResearchTickerInput,
@@ -283,7 +284,7 @@ function App() {
     removeReport: removeResearch,
     addTickerToEdit: addResearchTicker,
     removeTickerFromEdit: removeResearchTicker
-  } = useResearchModule({ onMessage: setMessage });
+  } = useResearchModule();
 
   useEffect(() => {
     if (activeModule === "researchModule") {
@@ -405,6 +406,7 @@ function App() {
           editContent={researchEditContent}
           editTickers={researchEditTickers}
           tickerInput={researchTickerInput}
+          error={researchError}
           onSelectReport={selectResearch}
           onStartCreate={startResearchCreate}
           onStartEdit={startResearchEdit}
