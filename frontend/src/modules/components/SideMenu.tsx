@@ -10,7 +10,7 @@ type SideMenuProps = {
 export function SideMenu({ isCollapsed, activeModule, onToggleCollapse, onSelectModule }: SideMenuProps) {
   return (
     <aside className={`side-menu ${isCollapsed ? "collapsed" : ""}`}>
-      <div className="side-menu-brand">
+      <div className="side-menu-brand" onClick={onToggleCollapse} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
         <span className="side-menu-brand-icon">📈</span>
         <span className="side-menu-brand-text">TickerBase</span>
       </div>
@@ -50,11 +50,6 @@ export function SideMenu({ isCollapsed, activeModule, onToggleCollapse, onSelect
         </button>
       </nav>
 
-      <div className="side-menu-footer">
-        <button className="menu-toggle" onClick={onToggleCollapse} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
-          {isCollapsed ? "»" : "«"}
-        </button>
-      </div>
     </aside>
   );
 }

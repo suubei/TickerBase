@@ -158,6 +158,12 @@ p {
   gap: 8px;
   flex-shrink: 0;
   overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+
+.side-menu-brand:hover {
+  background: var(--hover);
 }
 
 .side-menu-brand-icon {
@@ -191,31 +197,6 @@ p {
   overflow-y: auto;
 }
 
-.side-menu-footer {
-  padding: 8px;
-  border-top: 1px solid var(--line);
-  flex-shrink: 0;
-}
-
-.menu-toggle {
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: var(--text-soft);
-  border-radius: 6px;
-  padding: 8px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-toggle:hover {
-  background: var(--hover);
-  color: var(--text);
-}
 
 .menu-item {
   border: none;
@@ -2668,14 +2649,6 @@ td button {
     gap: 4px;
     overflow-x: auto;
     overflow-y: visible;
-  }
-
-  .side-menu-footer {
-    border-top: none;
-    border-left: 1px solid var(--line);
-    padding: 6px 8px;
-    display: flex;
-    align-items: center;
   }
 
   .side-menu.collapsed .menu-label,
