@@ -9,7 +9,7 @@ export function TradingViewAdvancedChart({ symbol }: TradingViewAdvancedChartPro
     const host = document.getElementById("tv-advanced-chart-container");
     if (!host) return;
     host.innerHTML = "";
-    const normalizedSymbol = symbol.includes(":") ? symbol : (symbol ? `NASDAQ:${symbol}` : "NASDAQ:AAPL");
+    const normalizedSymbol = symbol.includes(":") ? symbol : (symbol || "AAPL");
 
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
