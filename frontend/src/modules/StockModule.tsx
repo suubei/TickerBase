@@ -133,7 +133,7 @@ export function StockModule(props: StockModuleProps) {
           <span className="stock-bulkcount">{selectedTickers.length} selected</span>
           <div className="stock-bulk-spacer" />
           <button className="btn-secondary" onClick={onExportSelectedTickers} disabled={selectedTickers.length === 0}>Export</button>
-          <button className="btn-secondary" onClick={() => onOpenWatchlistModal("selected")} disabled={selectedTickers.length === 0}>★ New Watchlist</button>
+          <button className="btn-secondary" onClick={() => onOpenWatchlistModal("selected")} disabled={selectedTickers.length === 0}>New Watchlist</button>
           <button className="btn-secondary" onClick={onArchiveSelectedStocks} disabled={selectedTickers.length === 0}>Archive</button>
           <button className="btn-secondary" onClick={onUnarchiveSelectedStocks} disabled={selectedTickers.length === 0}>Unarchive</button>
         </div>

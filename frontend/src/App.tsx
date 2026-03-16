@@ -123,6 +123,7 @@ function App() {
     loadWatchlists,
     removeFromWatchlist,
     removeWatchlist,
+    renameWatchlist,
     exportWatchlist,
     addTicker,
     reorderWatchlists,
@@ -396,6 +397,7 @@ function App() {
           activeChartTicker={activeChartTicker}
           onToggleWatchlist={onToggleWatchlist}
           onDeleteWatchlist={onDeleteWatchlist}
+          onRenameWatchlist={(id, name) => void renameWatchlist(id, name)}
           onSelectTicker={setActiveChartTicker}
           onRemoveTicker={onRemoveTicker}
           onExportWatchlist={exportWatchlist}

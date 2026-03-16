@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { addTickerToWatchlist, deleteWatchlist, getWatchlists, removeTickerFromWatchlist, reorderWatchlists as reorderWatchlistsApi, reorderWatchlistStocks as reorderWatchlistStocksApi } from "../../api";
+import { addTickerToWatchlist, deleteWatchlist, getWatchlists, removeTickerFromWatchlist, renameWatchlist as renameWatchlistApi, reorderWatchlists as reorderWatchlistsApi, reorderWatchlistStocks as reorderWatchlistStocksApi } from "../../api";
 import type { Watchlist } from "../../types";
 
 export function useWatchlistModule(onMessage: (message: string) => void) {
@@ -87,6 +87,19 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
       onMessage(err instanceof Error ? err.message : "Failed to add ticker");
     }
   }, [loadWatchlists, onMessage]);
+
+  const renameWatchlist = useCallback(async (watchlistId: number, name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    try {
+      await renameWatchlistApi(watchlistId, trimmed);
+      setWatchlists((prev) =>
+        prev.map((w) => w.id === watchlistId ? { ...w, name: trimmed } : w)
+      );
+    } catch (err) {
+      onMessage(err instanceof Error ? err.message : "Failed to rename watchlist");
+    }
+  }, [onMessage]);
 
   const reorderWatchlists = useCallback(async (fromId: number, toId: number) => {
     const base = watchlists.map((w) => w.id);
@@ -177,6 +190,7 @@ export function useWatchlistModule(onMessage: (message: string) => void) {
     loadWatchlists,
     removeFromWatchlist,
     removeWatchlist,
+    renameWatchlist,
     addTicker,
     exportWatchlist,
     reorderWatchlists,

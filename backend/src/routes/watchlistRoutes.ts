@@ -210,6 +210,23 @@ export function createWatchlistRoutes({ prisma }: WatchlistRoutesOptions) {
     return res.status(201).json({ id, ticker });
   }));
 
+  router.patch("/watchlists/:id", withAsync(async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ error: "Invalid watchlist id" });
+    }
+    const { name } = req.body as { name?: string };
+    if (typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ error: "name is required" });
+    }
+    const watchlist = await prisma.watchlist.findUnique({ where: { id } });
+    if (!watchlist) {
+      return res.status(404).json({ error: "Watchlist not found" });
+    }
+    const updated = await prisma.watchlist.update({ where: { id }, data: { name: name.trim() } });
+    return res.json({ id: updated.id, name: updated.name });
+  }));
+
   router.delete("/watchlists/:id", withAsync(async (req, res) => {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {

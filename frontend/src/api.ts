@@ -143,6 +143,13 @@ export async function addTickerToWatchlist(watchlistId: number, ticker: string) 
   });
 }
 
+export async function renameWatchlist(watchlistId: number, name: string) {
+  return request<{ id: number; name: string }>(`/watchlists/${watchlistId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ name })
+  });
+}
+
 export async function deleteWatchlist(watchlistId: number) {
   return request<void>(`/watchlists/${watchlistId}`, {
     method: "DELETE"

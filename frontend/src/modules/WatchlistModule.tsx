@@ -20,6 +20,7 @@ type WatchlistModuleProps = {
   activeChartTicker: string;
   onToggleWatchlist: (id: number) => void;
   onDeleteWatchlist: (id: number) => void;
+  onRenameWatchlist: (id: number, name: string) => void;
   onSelectTicker: (ticker: string) => void;
   onRemoveTicker: (watchlistId: number, ticker: string) => void;
   onExportWatchlist: (watchlistId: number) => void;
@@ -36,6 +37,7 @@ export function WatchlistModule({
   activeChartTicker,
   onToggleWatchlist,
   onDeleteWatchlist,
+  onRenameWatchlist,
   onSelectTicker,
   onRemoveTicker,
   onExportWatchlist,
@@ -48,6 +50,8 @@ export function WatchlistModule({
   const [ctxMenu, setCtxMenu] = useState<CtxMenu | null>(null);
   const [addTickerModal, setAddTickerModal] = useState<{ watchlistId: number } | null>(null);
   const [newTicker, setNewTicker] = useState("");
+  const [renameModal, setRenameModal] = useState<{ watchlistId: number; currentName: string } | null>(null);
+  const [renameValue, setRenameValue] = useState("");
   const [dragOver, setDragOver] = useState<DragOver>(null);
   const dragState = useRef<{ type: "watchlist" | "stock"; watchlistId: number; ticker?: string } | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -317,6 +321,16 @@ export function WatchlistModule({
               </button>
               <button
                 onClick={() => {
+                  const wl = watchlists.find((w) => w.id === ctxMenu.watchlistId);
+                  setRenameValue(wl?.name ?? "");
+                  setRenameModal({ watchlistId: ctxMenu.watchlistId, currentName: wl?.name ?? "" });
+                  setCtxMenu(null);
+                }}
+              >
+                ✎ Rename
+              </button>
+              <button
+                onClick={() => {
                   onExportWatchlist(ctxMenu.watchlistId);
                   setCtxMenu(null);
                 }}
@@ -335,6 +349,52 @@ export function WatchlistModule({
               </button>
             </>
           )}
+        </div>
+      )}
+
+      {/* ── Rename Watchlist modal ── */}
+      {renameModal && (
+        <div className="dialog-backdrop" onClick={() => setRenameModal(null)}>
+          <section
+            className="dialog-panel wl-add-dialog"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="wl-add-header">
+              <span className="wl-add-title">Rename Watchlist</span>
+              <button className="wl-add-close" aria-label="Close" onClick={() => setRenameModal(null)}>✕</button>
+            </div>
+            <div className="wl-add-body">
+              <div className="wl-search-wrap">
+                <input
+                  className="wl-search-input"
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  placeholder="Watchlist name…"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && renameValue.trim()) {
+                      onRenameWatchlist(renameModal.watchlistId, renameValue.trim());
+                      setRenameModal(null);
+                    }
+                    if (e.key === "Escape") setRenameModal(null);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="wl-add-footer">
+              <button className="btn-secondary" onClick={() => setRenameModal(null)}>Cancel</button>
+              <button
+                className="btn-primary"
+                disabled={!renameValue.trim() || renameValue.trim() === renameModal.currentName}
+                onClick={() => {
+                  onRenameWatchlist(renameModal.watchlistId, renameValue.trim());
+                  setRenameModal(null);
+                }}
+              >
+                Rename
+              </button>
+            </div>
+          </section>
         </div>
       )}
 
