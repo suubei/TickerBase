@@ -390,7 +390,10 @@ function App() {
         onCreate={onCreateWatchlist}
       />
 
-      {activeModule === "watchlistModule" ? (
+      <div
+        aria-hidden={activeModule !== "watchlistModule"}
+        style={{ display: activeModule === "watchlistModule" ? "contents" : "none" }}
+      >
         <WatchlistModule
           watchlists={watchlists}
           expandedWatchlistId={expandedWatchlistId}
@@ -407,7 +410,7 @@ function App() {
           onMoveStock={moveStockBetweenWatchlists}
           renderChart={(ticker) => <TradingViewAdvancedChart symbol={ticker} />}
         />
-      ) : null}
+      </div>
 
       {activeModule === "researchModule" ? (
         <ResearchModule
