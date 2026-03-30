@@ -5,6 +5,7 @@ backend/dev.db
 backend/dev.db-journal
 backend/dist
 frontend/dist
+*.tsbuildinfo
 .DS_Store
 frontend/demo/
 
